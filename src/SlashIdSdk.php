@@ -3,6 +3,7 @@
 namespace SlashId\Php;
 
 use GuzzleHttp\Client;
+use SlashId\Php\Abstraction\WebhookAbstraction;
 
 class SlashIdSdk
 {
@@ -17,6 +18,7 @@ class SlashIdSdk
 
     protected Client $client;
     protected string $apiUrl;
+    protected WebhookAbstraction $webhook;
 
     public function __construct(
         protected string $environment,
@@ -38,6 +40,14 @@ class SlashIdSdk
 
     public function getApiUrl(): string {
         return $this->apiUrl;
+    }
+
+    public function webhook(): WebhookAbstraction {
+        if (!isset($this->webhook)) {
+            $this->webhook = new WebhookAbstraction($this);
+        }
+
+        return $this->webhook;
     }
 
     public function get(string $endpoint, array $query = NULL)
