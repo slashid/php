@@ -79,40 +79,92 @@ class SlashIdSdk
     /**
      * Perfoms a GET request to the API.
      *
-     * @param string $endpoint
-     *   The endpoint to the API, e.g. "/persons". If the endpoint requires an
-     *   ID in the path, do include it, e.g.:
-     *   "/persons/903c1ff9-f2cc-435c-b242-9d8a690fcf0a".
-     * @param array
+     * @param string $endpoint The endpoint to the API, e.g. "/persons". If the
+     *                         endpoint requires an ID in the path, do include
+     *                         it in the parameter, e.g.:
+     *                         "/persons/903c1ff9-f2cc-435c-b242-9d8a690fcf0a".
+     *                         The $endpoint MUST ALWAYS start with "/".
+     * @param array|null $query The query to be included in the request. E.g.
+     *                          for /persons/903c...f0a?fields=handles,groups
+     *                          pass this a parameter:
+     *                          ['fields' => ['handles', 'groups']].
+     *
+     * @return array The "result" part of the response, decoded as an array.
      */
-    public function get(string $endpoint, array $query = null)
+    public function get(string $endpoint, ?array $query = null): ?array
     {
         return $this->request('GET', $endpoint, $query, null);
     }
 
     /**
      * Performs a POST request to the API.
+     *
+     * @param string $endpoint The endpoint to the API, e.g. "/persons". If the
+     *                         endpoint requires an ID in the path, do include
+     *                         it in the parameter, e.g.:
+     *                         "/persons/903c1ff9-f2cc-435c-b242-9d8a690fcf0a".
+     * @param array|null $body The body of the request, as an array that will be
+     *                         encoded as JSON.
+     *
+     * @return array The "result" part of the response, decoded as an array.
      */
-    public function post(string $endpoint, ?array $body = null)
+    public function post(string $endpoint, ?array $body = null): ?array
     {
         return $this->request('POST', $endpoint, null, $body);
     }
 
-    public function patch(string $endpoint, ?array $body = null)
+    /**
+     * Performs a PATCH request to the API.
+     *
+     * @param string $endpoint The endpoint to the API, e.g. "/persons". If the
+     *                         endpoint requires an ID in the path, do include
+     *                         it in the parameter, e.g.:
+     *                         "/persons/903c1ff9-f2cc-435c-b242-9d8a690fcf0a".
+     * @param array|null $body The body of the request, as an array that will be
+     *                         encoded as JSON.
+     *
+     * @return array The "result" part of the response, decoded as an array.
+     */
+    public function patch(string $endpoint, ?array $body = null): ?array
     {
         return $this->request('PATCH', $endpoint, null, $body);
     }
 
-    public function put(string $endpoint, ?array $body = null)
+    /**
+     * Performs a PUT request to the API.
+     *
+     * @param string $endpoint The endpoint to the API, e.g. "/persons". If the
+     *                         endpoint requires an ID in the path, do include
+     *                         it in the parameter, e.g.:
+     *                         "/persons/903c1ff9-f2cc-435c-b242-9d8a690fcf0a".
+     * @param array|null $body The body of the request, as an array that will be
+     *                         encoded as JSON.
+     *
+     * @return array The "result" part of the response, decoded as an array.
+     */
+    public function put(string $endpoint, ?array $body = null): ?array
     {
         return $this->request('PUT', $endpoint, null, $body);
     }
 
-    public function delete(string $endpoint, ?array $query = null)
+    /**
+     * Performs a DELETE request to the API.
+     *
+     * @param string $endpoint The endpoint to the API, e.g. "/persons". If the
+     *                         endpoint requires an ID in the path, do include
+     *                         it in the parameter, e.g.:
+     *                         "/persons/903c1ff9-f2cc-435c-b242-9d8a690fcf0a".
+     * @param array|null $body The body of the request, as an array that will be
+     *                         encoded as JSON.
+     */
+    public function delete(string $endpoint, ?array $query = null): void
     {
-        return $this->request('DELETE', $endpoint, $query, null);
+        $this->request('DELETE', $endpoint, $query, null);
     }
 
+    /**
+     * Performs a request.
+     */
     protected function request(string $method, string $endpoint, ?array $query, ?array $body)
     {
         $options = [];
@@ -131,11 +183,14 @@ class SlashIdSdk
         return $parsedResponse['result'] ?? null;
     }
 
+    /**
+     * Gets the GuzzlePHP client, instantiating it if needed.
+     */
     protected function getClient(): Client
     {
         if (!isset($this->client)) {
             $this->client = new Client([
-                'base_uri' => self::ENVIRONMENT_ENDPOINTS[$this->environment],
+                'base_uri' => $this->apiUrl,
                 'headers' => [
                     'Accept' => 'application/json',
                     'Content-Type' => 'application/json',
