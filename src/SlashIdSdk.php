@@ -65,7 +65,7 @@ class SlashIdSdk
     }
 
     /**
-     * Instantiates a webhook abstraction, to handle webhook requests to the API
+     * Instantiates a webhook abstraction, to handle webhook requests to the API.
      */
     public function webhook(): WebhookAbstraction
     {
@@ -78,8 +78,14 @@ class SlashIdSdk
 
     /**
      * Perfoms a GET request to the API.
+     *
+     * @param string $endpoint
+     *   The endpoint to the API, e.g. "/persons". If the endpoint requires an
+     *   ID in the path, do include it, e.g.:
+     *   "/persons/903c1ff9-f2cc-435c-b242-9d8a690fcf0a".
+     * @param array
      */
-    public function get(string $endpoint, ?array $query = null)
+    public function get(string $endpoint, array $query = null)
     {
         return $this->request('GET', $endpoint, $query, null);
     }
@@ -112,7 +118,7 @@ class SlashIdSdk
         $options = [];
 
         if (!empty($query)) {
-            $options['query'] = $query;
+            $options['query'] = array_map(fn($item) => is_array($item) ? implode(',', $item) : $item, $query);
         }
 
         if (!is_null($body)) {
