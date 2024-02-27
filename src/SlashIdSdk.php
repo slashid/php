@@ -16,6 +16,7 @@ class SlashIdSdk
     ];
 
     protected Client $client;
+    protected string $apiUrl;
 
     public function __construct(
         protected string $environment,
@@ -27,6 +28,16 @@ class SlashIdSdk
             // @todo create custom exception class.
             throw new \Exception('Invalid environment.');
         }
+
+        $this->apiUrl = self::ENVIRONMENT_ENDPOINTS[$this->environment];
+    }
+
+    public function getOrganizationId(): string {
+        return $this->organizationId;
+    }
+
+    public function getApiUrl(): string {
+        return $this->apiUrl;
     }
 
     public function get(string $endpoint, array $query = NULL)
