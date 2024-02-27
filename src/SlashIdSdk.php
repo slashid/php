@@ -7,11 +7,9 @@ use SlashId\Php\Abstraction\WebhookAbstraction;
 
 class SlashIdSdk
 {
-
-    const ENVIRONMENT_PRODUCTION = 'production';
-    const ENVIRONMENT_SANDBOX = 'sandbox';
-
-    const ENVIRONMENT_ENDPOINTS = [
+    public const ENVIRONMENT_PRODUCTION = 'production';
+    public const ENVIRONMENT_SANDBOX = 'sandbox';
+    public const ENVIRONMENT_ENDPOINTS = [
         self::ENVIRONMENT_PRODUCTION => 'https://api.slashid.com/',
         self::ENVIRONMENT_SANDBOX => 'https://api.sandbox.slashid.com/',
     ];
@@ -24,8 +22,7 @@ class SlashIdSdk
         protected string $environment,
         protected string $organizationId,
         protected string $apiKey,
-    )
-    {
+    ) {
         if (!isset(self::ENVIRONMENT_ENDPOINTS[$this->environment])) {
             // @todo create custom exception class.
             throw new \Exception('Invalid environment.');
@@ -34,15 +31,18 @@ class SlashIdSdk
         $this->apiUrl = self::ENVIRONMENT_ENDPOINTS[$this->environment];
     }
 
-    public function getOrganizationId(): string {
+    public function getOrganizationId(): string
+    {
         return $this->organizationId;
     }
 
-    public function getApiUrl(): string {
+    public function getApiUrl(): string
+    {
         return $this->apiUrl;
     }
 
-    public function webhook(): WebhookAbstraction {
+    public function webhook(): WebhookAbstraction
+    {
         if (!isset($this->webhook)) {
             $this->webhook = new WebhookAbstraction($this);
         }
@@ -50,32 +50,33 @@ class SlashIdSdk
         return $this->webhook;
     }
 
-    public function get(string $endpoint, array $query = NULL)
+    public function get(string $endpoint, array $query = null)
     {
-        return $this->request('GET', $endpoint, $query, NULL);
+        return $this->request('GET', $endpoint, $query, null);
     }
 
-    public function post(string $endpoint, array $body = NULL)
+    public function post(string $endpoint, array $body = null)
     {
-        return $this->request('POST', $endpoint, NULL, $body);
+        return $this->request('POST', $endpoint, null, $body);
     }
 
-    public function patch(string $endpoint, array $body = NULL)
+    public function patch(string $endpoint, array $body = null)
     {
-        return $this->request('PATCH', $endpoint, NULL, $body);
+        return $this->request('PATCH', $endpoint, null, $body);
     }
 
-    public function put(string $endpoint, array $body = NULL)
+    public function put(string $endpoint, array $body = null)
     {
-        return $this->request('PUT', $endpoint, NULL, $body);
+        return $this->request('PUT', $endpoint, null, $body);
     }
 
-    public function delete(string $endpoint, array $query = NULL)
+    public function delete(string $endpoint, array $query = null)
     {
-        return $this->request('DELETE', $endpoint, $query, NULL);
+        return $this->request('DELETE', $endpoint, $query, null);
     }
 
-    protected function request(string $method, string $endpoint, ?array $query, ?array $body) {
+    protected function request(string $method, string $endpoint, ?array $query, ?array $body)
+    {
         $options = [];
 
         if (!empty($query)) {
@@ -87,11 +88,12 @@ class SlashIdSdk
         }
 
         $response = $this->getClient()->request($method, $endpoint, $options);
-        $parsedResponse = \json_decode((string) $response->getBody(), TRUE);
-        return $parsedResponse['result'] ?? NULL;
+        $parsedResponse = \json_decode((string) $response->getBody(), true);
+        return $parsedResponse['result'] ?? null;
     }
 
-    protected function getClient(): Client {
+    protected function getClient(): Client
+    {
         if (!isset($this->client)) {
             $this->client = new Client([
                 'base_uri' => self::ENVIRONMENT_ENDPOINTS[$this->environment],
@@ -106,5 +108,4 @@ class SlashIdSdk
 
         return $this->client;
     }
-
 }
