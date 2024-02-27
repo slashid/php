@@ -7,17 +7,31 @@ use SlashId\Php\Abstraction\WebhookAbstraction;
 
 class SlashIdSdk
 {
-    /**
-     * @var string
-     */
     public const ENVIRONMENT_PRODUCTION = 'production';
     public const ENVIRONMENT_SANDBOX = 'sandbox';
-    public const ENVIRONMENT_ENDPOINTS = [
+
+    /**
+     * List of URL.
+     *
+     * To get the API URL for a given environment, use the method getApiUrl().
+     *
+     * @see SlashIdSdk::getApiUrl()
+     */
+    protected const ENVIRONMENT_URLS = [
         self::ENVIRONMENT_PRODUCTION => 'https://api.slashid.com/',
         self::ENVIRONMENT_SANDBOX => 'https://api.sandbox.slashid.com/',
     ];
 
+    /**
+     * The Guzzle client, lazy-instantiated when required.
+     */
     protected Client $client;
+
+    /**
+     * The API URL, defined from the constant self::ENVIRONMENT_URLS.
+     *
+     * @see SlashIdSdk::getApiUrl()
+     */
     protected string $apiUrl;
     protected WebhookAbstraction $webhook;
 
@@ -26,24 +40,33 @@ class SlashIdSdk
         protected string $organizationId,
         protected string $apiKey,
     ) {
-        if (!isset(self::ENVIRONMENT_ENDPOINTS[$this->environment])) {
+        if (!isset(self::ENVIRONMENT_URLS[$this->environment])) {
             // @todo create custom exception class.
             throw new \Exception('Invalid environment.');
         }
 
-        $this->apiUrl = self::ENVIRONMENT_ENDPOINTS[$this->environment];
+        $this->apiUrl = self::ENVIRONMENT_URLS[$this->environment];
     }
 
+    /**
+     * Gets the organization ID, as informed to the constructor.
+     */
     public function getOrganizationId(): string
     {
         return $this->organizationId;
     }
 
+    /**
+     * Gets the API URL, based on the environment informed to the constructor.
+     */
     public function getApiUrl(): string
     {
         return $this->apiUrl;
     }
 
+    /**
+     * Instantiates a webhook abstraction, to handle webhook requests to the API
+     */
     public function webhook(): WebhookAbstraction
     {
         if (!isset($this->webhook)) {
@@ -53,11 +76,17 @@ class SlashIdSdk
         return $this->webhook;
     }
 
+    /**
+     * Perfoms a GET request to the API.
+     */
     public function get(string $endpoint, ?array $query = null)
     {
         return $this->request('GET', $endpoint, $query, null);
     }
 
+    /**
+     * Performs a POST request to the API.
+     */
     public function post(string $endpoint, ?array $body = null)
     {
         return $this->request('POST', $endpoint, null, $body);

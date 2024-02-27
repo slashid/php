@@ -8,6 +8,5 @@ class AbstractionBase
 {
     public function __construct(
         protected SlashIdSdk $sdk
-    ) {
-    }
+    ) {}
 }
