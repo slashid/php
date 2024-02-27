@@ -7,6 +7,9 @@ use SlashId\Php\Abstraction\WebhookAbstraction;
 
 class SlashIdSdk
 {
+    /**
+     * @var string
+     */
     public const ENVIRONMENT_PRODUCTION = 'production';
     public const ENVIRONMENT_SANDBOX = 'sandbox';
     public const ENVIRONMENT_ENDPOINTS = [
@@ -50,27 +53,27 @@ class SlashIdSdk
         return $this->webhook;
     }
 
-    public function get(string $endpoint, array $query = null)
+    public function get(string $endpoint, ?array $query = null)
     {
         return $this->request('GET', $endpoint, $query, null);
     }
 
-    public function post(string $endpoint, array $body = null)
+    public function post(string $endpoint, ?array $body = null)
     {
         return $this->request('POST', $endpoint, null, $body);
     }
 
-    public function patch(string $endpoint, array $body = null)
+    public function patch(string $endpoint, ?array $body = null)
     {
         return $this->request('PATCH', $endpoint, null, $body);
     }
 
-    public function put(string $endpoint, array $body = null)
+    public function put(string $endpoint, ?array $body = null)
     {
         return $this->request('PUT', $endpoint, null, $body);
     }
 
-    public function delete(string $endpoint, array $query = null)
+    public function delete(string $endpoint, ?array $query = null)
     {
         return $this->request('DELETE', $endpoint, $query, null);
     }
@@ -89,6 +92,7 @@ class SlashIdSdk
 
         $response = $this->getClient()->request($method, $endpoint, $options);
         $parsedResponse = \json_decode((string) $response->getBody(), true);
+
         return $parsedResponse['result'] ?? null;
     }
 

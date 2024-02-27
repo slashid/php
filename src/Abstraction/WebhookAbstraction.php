@@ -11,7 +11,7 @@ class WebhookAbstraction extends AbstractionBase
 
     public function findById(string $id): array
     {
-        return $this->sdk->get('/organizations/webhooks/' . $id);
+        return $this->sdk->get('/organizations/webhooks/'.$id);
     }
 
     public function findByUrl(string $url): ?array
@@ -34,7 +34,7 @@ class WebhookAbstraction extends AbstractionBase
         ] + $options;
 
         if ($webhook = $this->findByUrl($url)) {
-            $this->sdk->patch('/organizations/webhooks/' . $webhook['id'], $payload);
+            $this->sdk->patch('/organizations/webhooks/'.$webhook['id'], $payload);
         } else {
             $this->sdk->post('/organizations/webhooks', $payload);
         }
@@ -42,7 +42,7 @@ class WebhookAbstraction extends AbstractionBase
 
     public function deleteById(string $id): void
     {
-        $this->sdk->delete('/organizations/webhooks/' . $id);
+        $this->sdk->delete('/organizations/webhooks/'.$id);
     }
 
     public function deleteByUrl(string $url): void
@@ -52,9 +52,6 @@ class WebhookAbstraction extends AbstractionBase
         }
 
         // @todo Create custom Exceptions.
-        throw new \Exception(
-            'There is no webhook in organization ' . $this->sdk->getOrganizationId() .
-            ' for the URL "' . $url . '".'
-        );
+        throw new \Exception('There is no webhook in organization '.$this->sdk->getOrganizationId().' for the URL "'.$url.'".');
     }
 }
