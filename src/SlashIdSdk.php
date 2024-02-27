@@ -3,6 +3,7 @@
 namespace SlashId\Php;
 
 use GuzzleHttp\Client;
+use SlashId\Php\Abstraction\WebhookAbstraction;
 
 class SlashIdSdk
 {
@@ -16,6 +17,8 @@ class SlashIdSdk
     ];
 
     protected Client $client;
+    protected string $apiUrl;
+    protected WebhookAbstraction $webhook;
 
     public function __construct(
         protected string $environment,
@@ -27,6 +30,24 @@ class SlashIdSdk
             // @todo create custom exception class.
             throw new \Exception('Invalid environment.');
         }
+
+        $this->apiUrl = self::ENVIRONMENT_ENDPOINTS[$this->environment];
+    }
+
+    public function getOrganizationId(): string {
+        return $this->organizationId;
+    }
+
+    public function getApiUrl(): string {
+        return $this->apiUrl;
+    }
+
+    public function webhook(): WebhookAbstraction {
+        if (!isset($this->webhook)) {
+            $this->webhook = new WebhookAbstraction($this);
+        }
+
+        return $this->webhook;
     }
 
     public function get(string $endpoint, array $query = NULL)
