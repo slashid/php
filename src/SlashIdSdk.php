@@ -79,17 +79,14 @@ class SlashIdSdk
     /**
      * Perfoms a GET request to the API.
      *
-     * @param string $endpoint The endpoint to the API, e.g. "/persons". If the
-     *                         endpoint requires an ID in the path, do include
-     *                         it in the parameter, e.g.:
-     *                         "/persons/903c1ff9-f2cc-435c-b242-9d8a690fcf0a".
-     *                         The $endpoint MUST ALWAYS start with "/".
-     * @param array|null $query The query to be included in the request. E.g.
-     *                          for /persons/903c...f0a?fields=handles,groups
-     *                          pass this a parameter:
-     *                          ['fields' => ['handles', 'groups']].
+     * @param string     $endpoint The endpoint to the API, e.g. "/persons". If the endpoint requires an ID in the path,
+     *                             include it in the parameter, e.g.: "/persons/903c1ff9-f2cc-435c-b242-9d8a690fcf0a".
+     *                             The $endpoint MUST ALWAYS start with "/".
+     * @param array|null $query    The query to be included in the request. E.g. for
+     *                             "/persons/903c...f0a?fields=handles,groups", pass this a parameter:
+     *                             ['fields' => ['handles', 'groups']].
      *
-     * @return array The "result" part of the response, decoded as an array.
+     * @return array the "result" part of the response, decoded as an array
      */
     public function get(string $endpoint, ?array $query = null): ?array
     {
@@ -99,14 +96,11 @@ class SlashIdSdk
     /**
      * Performs a POST request to the API.
      *
-     * @param string $endpoint The endpoint to the API, e.g. "/persons". If the
-     *                         endpoint requires an ID in the path, do include
-     *                         it in the parameter, e.g.:
-     *                         "/persons/903c1ff9-f2cc-435c-b242-9d8a690fcf0a".
-     * @param array|null $body The body of the request, as an array that will be
-     *                         encoded as JSON.
+     * @param string     $endpoint The endpoint to the API, e.g. "/persons". If the endpoint requires an ID in the path,
+     *                             include it in the parameter, e.g.: "/persons/903c1ff9-f2cc-435c-b242-9d8a690fcf0a".
+     * @param array|null $body     the body of the request, as an array that will be encoded as JSON
      *
-     * @return array The "result" part of the response, decoded as an array.
+     * @return array the "result" part of the response, decoded as an array
      */
     public function post(string $endpoint, ?array $body = null): ?array
     {
@@ -116,14 +110,11 @@ class SlashIdSdk
     /**
      * Performs a PATCH request to the API.
      *
-     * @param string $endpoint The endpoint to the API, e.g. "/persons". If the
-     *                         endpoint requires an ID in the path, do include
-     *                         it in the parameter, e.g.:
-     *                         "/persons/903c1ff9-f2cc-435c-b242-9d8a690fcf0a".
-     * @param array|null $body The body of the request, as an array that will be
-     *                         encoded as JSON.
+     * @param string     $endpoint The endpoint to the API, e.g. "/persons". If the endpoint requires an ID in the path,
+     *                             include it in the parameter, e.g.: "/persons/903c1ff9-f2cc-435c-b242-9d8a690fcf0a".
+     * @param array|null $body     the body of the request, as an array that will be encoded as JSON
      *
-     * @return array The "result" part of the response, decoded as an array.
+     * @return array the "result" part of the response, decoded as an array
      */
     public function patch(string $endpoint, ?array $body = null): ?array
     {
@@ -133,14 +124,11 @@ class SlashIdSdk
     /**
      * Performs a PUT request to the API.
      *
-     * @param string $endpoint The endpoint to the API, e.g. "/persons". If the
-     *                         endpoint requires an ID in the path, do include
-     *                         it in the parameter, e.g.:
-     *                         "/persons/903c1ff9-f2cc-435c-b242-9d8a690fcf0a".
-     * @param array|null $body The body of the request, as an array that will be
-     *                         encoded as JSON.
+     * @param string     $endpoint The endpoint to the API, e.g. "/persons". If the endpoint requires an ID in the path,
+     *                             include it in the parameter, e.g.: "/persons/903c1ff9-f2cc-435c-b242-9d8a690fcf0a".
+     * @param array|null $body     the body of the request, as an array that will be encoded as JSON
      *
-     * @return array The "result" part of the response, decoded as an array.
+     * @return array the "result" part of the response, decoded as an array
      */
     public function put(string $endpoint, ?array $body = null): ?array
     {
@@ -150,12 +138,11 @@ class SlashIdSdk
     /**
      * Performs a DELETE request to the API.
      *
-     * @param string $endpoint The endpoint to the API, e.g. "/persons". If the
-     *                         endpoint requires an ID in the path, do include
-     *                         it in the parameter, e.g.:
-     *                         "/persons/903c1ff9-f2cc-435c-b242-9d8a690fcf0a".
-     * @param array|null $body The body of the request, as an array that will be
-     *                         encoded as JSON.
+     * @param string     $endpoint The endpoint to the API, e.g. "/persons". If the endpoint requires an ID in the path,
+     *                             include it in the parameter, e.g.: "/persons/903c1ff9-f2cc-435c-b242-9d8a690fcf0a".
+     * @param array|null $query    The query to be included in the request. E.g. for
+     *                             "/persons/903c...f0a?fields=handles,groups", pass this a parameter:
+     *                             ['fields' => ['handles', 'groups']].
      */
     public function delete(string $endpoint, ?array $query = null): void
     {
