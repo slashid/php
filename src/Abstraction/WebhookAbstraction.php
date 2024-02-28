@@ -2,6 +2,12 @@
 
 namespace SlashId\Php\Abstraction;
 
+use Firebase\JWT\CachedKeySet;
+use Firebase\JWT\JWT;
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\HttpFactory;
+use Psr\Cache\CacheItemPoolInterface;
+
 class WebhookAbstraction extends AbstractionBase
 {
     /**
@@ -84,7 +90,7 @@ class WebhookAbstraction extends AbstractionBase
     {
         $webhooks = $this->findAll();
         foreach ($webhooks as $webhook) {
-            if ($webhook['target_id'] ?? null === $url) {
+            if ($webhook['target_url'] === $url) {
                 return $webhook;
             }
         }
@@ -116,7 +122,7 @@ class WebhookAbstraction extends AbstractionBase
      *
      *                              @endcode
      */
-    public function register(string $url, string $name, array $triggers, array $options): void
+    public function register(string $url, string $name, array $triggers, array $options = []): void
     {
         $payload = [
             'target_url' => $url,
@@ -126,8 +132,10 @@ class WebhookAbstraction extends AbstractionBase
         if ($webhook = $this->findByUrl($url)) {
             $this->sdk->patch('/organizations/webhooks/' . $webhook['id'], $payload);
         } else {
-            $this->sdk->post('/organizations/webhooks', $payload);
+            $webhook = $this->sdk->post('/organizations/webhooks', $payload);
         }
+
+        $this->setWebhookTriggers($webhook['id'], $triggers);
     }
 
     /**
@@ -153,5 +161,77 @@ class WebhookAbstraction extends AbstractionBase
 
         // @todo Create custom Exceptions.
         throw new \Exception('There is no webhook in organization ' . $this->sdk->getOrganizationId() . ' for the URL "' . $url . '".');
+    }
+
+    /**
+     * Lists triggers of a given webhook.
+     *
+     * @return string[] the list of webhook triggers
+     */
+    public function getWebhookTriggers(string $id): array
+    {
+        return array_map(
+            fn($trigger) => $trigger['trigger_name'],
+            $this->sdk->get('/organizations/webhooks/' . $id . '/triggers')
+        );
+    }
+
+    public function setWebhookTriggers(string $id, array $triggers): void
+    {
+        $existingTriggers = $this->getWebhookTriggers($id);
+
+        // Delete existing triggers taht are not in the list.
+        foreach (array_diff($existingTriggers, $triggers) as $triggerToDelete) {
+            $this->deleteWebhookTrigger($id, $triggerToDelete);
+        }
+
+        // Adds triggers that don't exist yet.
+        foreach (array_diff($triggers, $existingTriggers) as $triggerToAdd) {
+            $this->addWebhookTrigger($id, $triggerToAdd);
+        }
+    }
+
+    public function addWebhookTrigger(string $id, string $trigger): void
+    {
+        $this->sdk->post('/organizations/webhooks/' . $id . '/triggers', [
+            'trigger_type' => $this->getWebhookTriggerType($trigger),
+            'trigger_name' => $trigger,
+        ]);
+    }
+
+    public function deleteWebhookTrigger(string $id, string $trigger): void
+    {
+        $this->sdk->delete('/organizations/webhooks/' . $id . '/triggers', [
+            'trigger_type' => $this->getWebhookTriggerType($trigger),
+            'trigger_name' => $trigger,
+        ]);
+    }
+
+    public function decodeWebhookCall(string $jwt, CacheItemPoolInterface $cache, $expiresAfter = 3600, $rateLimit = true)
+    {
+        $httpClient = new Client([
+            'headers' => [
+                'SlashID-OrgID' => $this->sdk->getOrganizationId(),
+            ],
+        ]);
+
+        $keySet = new CachedKeySet(
+            $this->sdk->getApiUrl() . '/organizations/webhooks/verification-jwks',
+            $httpClient,
+            new HttpFactory(),
+            $cache,
+            $expiresAfter,
+            $rateLimit,
+        );
+
+        $decoded = JWT::decode($jwt, $keySet);
+
+        // Convert to array.
+        return \json_decode(\json_encode($decoded), true);
+    }
+
+    protected function getWebhookTriggerType(string $trigger): string
+    {
+        return 'token_minted' === $trigger ? 'sync_hook' : 'event';
     }
 }

@@ -18,8 +18,8 @@ class SlashIdSdk
      * @see SlashIdSdk::getApiUrl()
      */
     protected const ENVIRONMENT_URLS = [
-        self::ENVIRONMENT_PRODUCTION => 'https://api.slashid.com/',
-        self::ENVIRONMENT_SANDBOX => 'https://api.sandbox.slashid.com/',
+        self::ENVIRONMENT_PRODUCTION => 'https://api.slashid.com',
+        self::ENVIRONMENT_SANDBOX => 'https://api.sandbox.slashid.com',
     ];
 
     /**
