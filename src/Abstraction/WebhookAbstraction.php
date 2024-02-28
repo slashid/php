@@ -2,6 +2,12 @@
 
 namespace SlashId\Php\Abstraction;
 
+use Firebase\JWT\CachedKeySet;
+use Firebase\JWT\JWT;
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\HttpFactory;
+use Psr\Cache\CacheItemPoolInterface;
+
 class WebhookAbstraction extends AbstractionBase
 {
     /**
@@ -196,6 +202,29 @@ class WebhookAbstraction extends AbstractionBase
             'trigger_type' => $this->getWebhookTriggerType($trigger),
             'trigger_name' => $trigger,
         ]);
+    }
+
+    public function decodeWebhookCall(string $jwt, CacheItemPoolInterface $cache, $expiresAfter = 3600, $rateLimit = true)
+    {
+        $httpClient = new Client([
+            'headers' => [
+                'SlashID-OrgID' => $this->sdk->getOrganizationId(),
+            ],
+        ]);
+
+        $keySet = new CachedKeySet(
+            $this->sdk->getApiUrl() . '/organizations/webhooks/verification-jwks',
+            $httpClient,
+            new HttpFactory(),
+            $cache,
+            $expiresAfter,
+            $rateLimit,
+        );
+
+        $decoded = JWT::decode($jwt, $keySet);
+
+        // Convert to array.
+        return \json_decode(\json_encode($decoded), true);
     }
 
     protected function getWebhookTriggerType(string $trigger): string {
