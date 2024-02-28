@@ -166,7 +166,7 @@ class WebhookAbstraction extends AbstractionBase
     /**
      * Lists triggers of a given webhook.
      *
-     * @return string[] The list of webhook triggers.
+     * @return string[] the list of webhook triggers
      */
     public function getWebhookTriggers(string $id): array
     {
@@ -176,7 +176,8 @@ class WebhookAbstraction extends AbstractionBase
         );
     }
 
-    public function setWebhookTriggers(string $id, array $triggers): void {
+    public function setWebhookTriggers(string $id, array $triggers): void
+    {
         $existingTriggers = $this->getWebhookTriggers($id);
 
         // Delete existing triggers taht are not in the list.
@@ -190,14 +191,16 @@ class WebhookAbstraction extends AbstractionBase
         }
     }
 
-    public function addWebhookTrigger(string $id, string $trigger): void {
+    public function addWebhookTrigger(string $id, string $trigger): void
+    {
         $this->sdk->post('/organizations/webhooks/' . $id . '/triggers', [
             'trigger_type' => $this->getWebhookTriggerType($trigger),
             'trigger_name' => $trigger,
         ]);
     }
 
-    public function deleteWebhookTrigger(string $id, string $trigger): void {
+    public function deleteWebhookTrigger(string $id, string $trigger): void
+    {
         $this->sdk->delete('/organizations/webhooks/' . $id . '/triggers', [
             'trigger_type' => $this->getWebhookTriggerType($trigger),
             'trigger_name' => $trigger,
@@ -227,7 +230,8 @@ class WebhookAbstraction extends AbstractionBase
         return \json_decode(\json_encode($decoded), true);
     }
 
-    protected function getWebhookTriggerType(string $trigger): string {
-        return $trigger === 'token_minted' ? 'sync_hook' : 'event';
+    protected function getWebhookTriggerType(string $trigger): string
+    {
+        return 'token_minted' === $trigger ? 'sync_hook' : 'event';
     }
 }
