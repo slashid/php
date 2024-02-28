@@ -21,5 +21,9 @@
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.50"
+    },
+    "scripts": {
+        "test-cs": "vendor/bin/php-cs-fixer check --rules=@Symfony,@PER-CS2.0 src/",
+        "test-cs-fix": "vendor/bin/php-cs-fixer fix --rules=@Symfony,@PER-CS2.0 src/"
     }
 }
