@@ -24,8 +24,8 @@
         "phpunit/phpunit": "^10.5"
     },
     "scripts": {
-        "test-cs": "vendor/bin/php-cs-fixer check --rules=@Symfony,@PER-CS2.0 src/",
-        "test-cs-fix": "vendor/bin/php-cs-fixer fix --rules=@Symfony,@PER-CS2.0 src/",
+        "test-cs": "vendor/bin/php-cs-fixer check --rules=@Symfony,@PER-CS2.0 .",
+        "test-cs-fix": "vendor/bin/php-cs-fixer fix --rules=@Symfony,@PER-CS2.0 .",
         "test-phpunit": "vendor/bin/phpunit tests/unit/"
     }
 }
