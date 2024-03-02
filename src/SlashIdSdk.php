@@ -43,8 +43,7 @@ class SlashIdSdk
         protected ?HandlerStack $handlerStack = NULL,
     ) {
         if (!isset(self::ENVIRONMENT_URLS[$this->environment])) {
-            // @todo create custom exception class.
-            throw new \Exception('Invalid environment.');
+            throw new \InvalidArgumentException('Invalid environment "' . $this->environment . '". Valid options are: SlashIdSdk::ENVIRONMENT_PRODUCTION or SlashIdSdk::ENVIRONMENT_SANDBOX.');
         }
 
         $this->apiUrl = self::ENVIRONMENT_URLS[$this->environment];
