@@ -11,7 +11,6 @@ use SlashId\Php\Abstraction\WebhookAbstraction;
 
 class SlashIdSdkTest extends TestCase
 {
-
     /**
      * Tests invalid environment on __construct().
      */
@@ -19,7 +18,7 @@ class SlashIdSdkTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid environment "invalid_env". Valid options are: SlashIdSdk::ENVIRONMENT_PRODUCTION or SlashIdSdk::ENVIRONMENT_SANDBOX.');
-        $this->sdk(NULL, NULL, 'invalid_env');
+        $this->sdk(null, null, 'invalid_env');
     }
 
     /**
@@ -37,7 +36,7 @@ class SlashIdSdkTest extends TestCase
     public function testGetApiUrl(): void
     {
         $this->assertEquals('https://api.slashid.com', $this->sdk()->getApiUrl());
-        $this->assertEquals('https://api.sandbox.slashid.com', $this->sdk(NULL, NULL, SlashIdSdk::ENVIRONMENT_SANDBOX)->getApiUrl());
+        $this->assertEquals('https://api.sandbox.slashid.com', $this->sdk(null, null, SlashIdSdk::ENVIRONMENT_SANDBOX)->getApiUrl());
     }
 
     /**
@@ -151,12 +150,13 @@ class SlashIdSdkTest extends TestCase
     /**
      * Instantiates a SlashIdSdk class.
      */
-    protected function sdk(?MockHandler $mockHandler = NULL, ?callable $history = NULL, string $environment = SlashIdSdk::ENVIRONMENT_PRODUCTION): SlashIdSdk
+    protected function sdk(?MockHandler $mockHandler = null, ?callable $history = null, string $environment = SlashIdSdk::ENVIRONMENT_PRODUCTION): SlashIdSdk
     {
         $handlerStack = HandlerStack::create($mockHandler);
         if ($history) {
             $handlerStack->push($history);
         }
+
         return new SlashIdSdk($environment, 'org_id', 'api_key', $handlerStack);
     }
 
@@ -175,5 +175,4 @@ class SlashIdSdkTest extends TestCase
             ),
         ]);
     }
-
 }

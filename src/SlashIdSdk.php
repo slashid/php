@@ -40,7 +40,7 @@ class SlashIdSdk
         protected string $environment,
         protected string $organizationId,
         protected string $apiKey,
-        protected ?HandlerStack $handlerStack = NULL,
+        protected ?HandlerStack $handlerStack = null,
     ) {
         if (!isset(self::ENVIRONMENT_URLS[$this->environment])) {
             throw new \InvalidArgumentException('Invalid environment "' . $this->environment . '". Valid options are: SlashIdSdk::ENVIRONMENT_PRODUCTION or SlashIdSdk::ENVIRONMENT_SANDBOX.');
