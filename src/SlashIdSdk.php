@@ -3,6 +3,7 @@
 namespace SlashId\Php;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\HandlerStack;
 use SlashId\Php\Abstraction\WebhookAbstraction;
 
 class SlashIdSdk
@@ -39,6 +40,7 @@ class SlashIdSdk
         protected string $environment,
         protected string $organizationId,
         protected string $apiKey,
+        protected ?HandlerStack $handlerStack = NULL,
     ) {
         if (!isset(self::ENVIRONMENT_URLS[$this->environment])) {
             // @todo create custom exception class.
@@ -176,7 +178,7 @@ class SlashIdSdk
     protected function getClient(): Client
     {
         if (!isset($this->client)) {
-            $this->client = new Client([
+            $options = [
                 'base_uri' => $this->apiUrl,
                 'headers' => [
                     'Accept' => 'application/json',
@@ -184,7 +186,13 @@ class SlashIdSdk
                     'SlashID-OrgID' => $this->organizationId,
                     'SlashID-API-Key' => $this->apiKey,
                 ],
-            ]);
+            ];
+
+            if ($this->handlerStack) {
+                $options['handler'] = $this->handlerStack;
+            }
+
+            $this->client = new Client($options);
         }
 
         return $this->client;
