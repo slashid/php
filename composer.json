@@ -20,10 +20,12 @@
         "guzzlehttp/guzzle": "^7.2"
     },
     "require-dev": {
-        "friendsofphp/php-cs-fixer": "^3.50"
+        "friendsofphp/php-cs-fixer": "^3.50",
+        "phpunit/phpunit": "^10.5"
     },
     "scripts": {
         "test-cs": "vendor/bin/php-cs-fixer check --rules=@Symfony,@PER-CS2.0 src/",
-        "test-cs-fix": "vendor/bin/php-cs-fixer fix --rules=@Symfony,@PER-CS2.0 src/"
+        "test-cs-fix": "vendor/bin/php-cs-fixer fix --rules=@Symfony,@PER-CS2.0 src/",
+        "test-phpunit": "vendor/bin/phpunit tests/unit/"
     }
 }
