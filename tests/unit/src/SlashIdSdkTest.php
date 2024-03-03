@@ -2,7 +2,6 @@
 
 namespace SlashId\Test\Php;
 
-use GuzzleHttp\Middleware;
 use PHPUnit\Framework\TestCase;
 use SlashId\Php\Abstraction\WebhookAbstraction;
 use SlashId\Php\SlashIdSdk;
