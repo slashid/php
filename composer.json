@@ -5,7 +5,8 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "SlashId\\Php\\": "src/"
+            "SlashId\\Php\\": "src/",
+            "SlashId\\Test\\Php\\": "tests/unit/src/"
         }
     },
     "authors": [
@@ -17,13 +18,19 @@
     "require": {
         "php": "^8.1",
         "firebase/php-jwt": "^6.10",
-        "guzzlehttp/guzzle": "^7.2"
+        "guzzlehttp/guzzle": "^7.2",
+        "psr/cache": "^3.0"
     },
     "require-dev": {
-        "friendsofphp/php-cs-fixer": "^3.50"
+        "friendsofphp/php-cs-fixer": "^3.50",
+        "phpunit/phpunit": "^10.5",
+        "beste/in-memory-cache": "^1.1",
+        "crutch/clock-dev": "^1.0"
     },
     "scripts": {
-        "test-cs": "vendor/bin/php-cs-fixer check --rules=@Symfony,@PER-CS2.0 src/",
-        "test-cs-fix": "vendor/bin/php-cs-fixer fix --rules=@Symfony,@PER-CS2.0 src/"
+        "test-cs": "vendor/bin/php-cs-fixer check --rules=@Symfony,@PER-CS2.0 .",
+        "test-cs-fix": "vendor/bin/php-cs-fixer fix --rules=@Symfony,@PER-CS2.0 .",
+        "test-phpunit": "vendor/bin/phpunit tests/unit/",
+        "test-phpunit-coverage": "vendor/bin/phpunit --coverage-html tests/coverage --coverage-filter src/ tests/unit/"
     }
 }

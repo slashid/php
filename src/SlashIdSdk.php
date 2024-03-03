@@ -3,6 +3,7 @@
 namespace SlashId\Php;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\HandlerStack;
 use SlashId\Php\Abstraction\WebhookAbstraction;
 
 class SlashIdSdk
@@ -39,10 +40,10 @@ class SlashIdSdk
         protected string $environment,
         protected string $organizationId,
         protected string $apiKey,
+        protected ?HandlerStack $handlerStack = null,
     ) {
         if (!isset(self::ENVIRONMENT_URLS[$this->environment])) {
-            // @todo create custom exception class.
-            throw new \Exception('Invalid environment.');
+            throw new \InvalidArgumentException('Invalid environment "' . $this->environment . '". Valid options are: SlashIdSdk::ENVIRONMENT_PRODUCTION or SlashIdSdk::ENVIRONMENT_SANDBOX.');
         }
 
         $this->apiUrl = self::ENVIRONMENT_URLS[$this->environment];
@@ -70,7 +71,7 @@ class SlashIdSdk
     public function webhook(): WebhookAbstraction
     {
         if (!isset($this->webhook)) {
-            $this->webhook = new WebhookAbstraction($this);
+            $this->webhook = new WebhookAbstraction($this, $this->getClient());
         }
 
         return $this->webhook;
@@ -176,7 +177,7 @@ class SlashIdSdk
     protected function getClient(): Client
     {
         if (!isset($this->client)) {
-            $this->client = new Client([
+            $options = [
                 'base_uri' => $this->apiUrl,
                 'headers' => [
                     'Accept' => 'application/json',
@@ -184,7 +185,13 @@ class SlashIdSdk
                     'SlashID-OrgID' => $this->organizationId,
                     'SlashID-API-Key' => $this->apiKey,
                 ],
-            ]);
+            ];
+
+            if ($this->handlerStack) {
+                $options['handler'] = $this->handlerStack;
+            }
+
+            $this->client = new Client($options);
         }
 
         return $this->client;
