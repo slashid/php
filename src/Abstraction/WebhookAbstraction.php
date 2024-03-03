@@ -157,10 +157,10 @@ class WebhookAbstraction extends AbstractionBase
     {
         if ($webhook = $this->findByUrl($url)) {
             $this->deleteById($webhook['id']);
+        } else {
+            // @todo Create custom Exceptions.
+            throw new \Exception('There is no webhook in organization ' . $this->sdk->getOrganizationId() . ' for the URL "' . $url . '".');
         }
-
-        // @todo Create custom Exceptions.
-        throw new \Exception('There is no webhook in organization ' . $this->sdk->getOrganizationId() . ' for the URL "' . $url . '".');
     }
 
     /**
