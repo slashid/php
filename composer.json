@@ -5,7 +5,8 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "SlashId\\Php\\": "src/"
+            "SlashId\\Php\\": "src/",
+            "SlashId\\Test\\Php\\": "tests/unit/src/"
         }
     },
     "authors": [

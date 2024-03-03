@@ -1,16 +1,17 @@
 <?php
 
-namespace SlashId\Php;
+namespace SlashId\Test\Php;
 
-use GuzzleHttp\Handler\MockHandler;
-use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
-use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
 use SlashId\Php\Abstraction\WebhookAbstraction;
+use SlashId\Php\SlashIdSdk;
+use SlashId\Test\Php\TestHelper\SdkInstantiationTrait;
 
 class SlashIdSdkTest extends TestCase
 {
+    use SdkInstantiationTrait;
+
     /**
      * Tests invalid environment on __construct().
      */
@@ -18,7 +19,7 @@ class SlashIdSdkTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid environment "invalid_env". Valid options are: SlashIdSdk::ENVIRONMENT_PRODUCTION or SlashIdSdk::ENVIRONMENT_SANDBOX.');
-        $this->sdk(null, null, 'invalid_env');
+        $this->sdk(environment: 'invalid_env');
     }
 
     /**
@@ -26,8 +27,7 @@ class SlashIdSdkTest extends TestCase
      */
     public function testGetOrganizationId(): void
     {
-        $sdk = new SlashIdSdk(SlashIdSdk::ENVIRONMENT_PRODUCTION, 'org_id', 'api_key');
-        $this->assertEquals('org_id', $sdk->getOrganizationId());
+        $this->assertEquals('org_id', $this->sdk()->getOrganizationId());
     }
 
     /**
@@ -36,7 +36,7 @@ class SlashIdSdkTest extends TestCase
     public function testGetApiUrl(): void
     {
         $this->assertEquals('https://api.slashid.com', $this->sdk()->getApiUrl());
-        $this->assertEquals('https://api.sandbox.slashid.com', $this->sdk(null, null, SlashIdSdk::ENVIRONMENT_SANDBOX)->getApiUrl());
+        $this->assertEquals('https://api.sandbox.slashid.com', $this->sdk(environment: SlashIdSdk::ENVIRONMENT_SANDBOX)->getApiUrl());
     }
 
     /**
@@ -132,10 +132,8 @@ class SlashIdSdkTest extends TestCase
      */
     public function testRequests(string $method, string $targetUrl, ?array $queryOrBody, int $responseHttpCode, string $responseBody, string $expectedRequestUrl, ?array $expectedResult): void
     {
-        $mockHandler = $this->mockHandler($responseHttpCode, $responseBody);
         $historyContainer = [];
-        $history = Middleware::history($historyContainer);
-        $sdk = $this->sdk($mockHandler, $history);
+        $sdk = $this->sdk($historyContainer, [[$responseHttpCode, $responseBody]]);
 
         $result = $sdk->{$method}($targetUrl, $queryOrBody);
 
@@ -145,34 +143,5 @@ class SlashIdSdkTest extends TestCase
         // Checks results.
         $this->assertEquals($expectedRequestUrl, $request->getRequestTarget());
         $this->assertEquals($expectedResult, $result);
-    }
-
-    /**
-     * Instantiates a SlashIdSdk class.
-     */
-    protected function sdk(?MockHandler $mockHandler = null, ?callable $history = null, string $environment = SlashIdSdk::ENVIRONMENT_PRODUCTION): SlashIdSdk
-    {
-        $handlerStack = HandlerStack::create($mockHandler);
-        if ($history) {
-            $handlerStack->push($history);
-        }
-
-        return new SlashIdSdk($environment, 'org_id', 'api_key', $handlerStack);
-    }
-
-    /**
-     * Instantiates a MockHandler.
-     */
-    protected function mockHandler(int $httpCode, ?string $data): MockHandler
-    {
-        return new MockHandler([
-            new Response(
-                $httpCode,
-                [
-                    'Content-Type' => 'application/json',
-                ],
-                $data,
-            ),
-        ]);
     }
 }
