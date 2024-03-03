@@ -2,8 +2,6 @@
 
 namespace SlashId\Php\Abstraction;
 
-use Beste\Cache\CacheItem;
-use Beste\Cache\CacheKey;
 use Beste\Cache\InMemoryCache;
 use Crutch\DevClock\ClockWaited;
 use Firebase\JWT\JWT;
