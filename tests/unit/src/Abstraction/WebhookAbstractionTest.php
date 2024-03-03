@@ -2,6 +2,11 @@
 
 namespace SlashId\Php\Abstraction;
 
+use Beste\Cache\CacheItem;
+use Beste\Cache\CacheKey;
+use Beste\Cache\InMemoryCache;
+use Crutch\DevClock\ClockWaited;
+use Firebase\JWT\JWT;
 use PHPUnit\Framework\TestCase;
 use SlashId\Test\Php\TestHelper\SdkInstantiationTrait;
 
@@ -197,6 +202,20 @@ class WebhookAbstractionTest extends TestCase
     }
 
     /**
+     * Tests deleteByUrl() when the URL does not exist.
+     */
+    public function testDeleteByUrlNotExisting(): void
+    {
+        $this->expectExceptionMessage('There is no webhook in organization org_id for the URL "https://example.com/slashid/non_existing_webhook".');
+
+        $historyContainer = [];
+        $webhook = $this->webhook($historyContainer, [
+            [200, self::INDEX_RAW_RESPONSE],
+        ]);
+        $webhook->deleteByUrl('https://example.com/slashid/non_existing_webhook');
+    }
+
+    /**
      * Tests setWebhookTriggers().
      */
     public function testSetWebhookTriggers(): void
@@ -228,10 +247,31 @@ class WebhookAbstractionTest extends TestCase
     }
 
     /**
+     * Tests decodeWebhookCall().
+     */
+    public function testDecodeWebhookCall(): void
+    {
+        $jwt = 'eyJhbGciOiJFUzI1NiIsICJraWQiOiJuTGtxV1EifQ.eyJhdWQiOiI0MTJlZGI1Ny1hZTI2LWYyYWEtMDY5OC03NzAwMjFlZDUyZDEiLCAiZXhwIjoxNzA5NDMzMTIwLCAiaWF0IjoxNzA5NDMxOTIwLCAiaXNzIjoiaHR0cHM6Ly9hcGkuc2FuZGJveC5zbGFzaGlkLmNvbSIsICJqdGkiOiIwMDAzYWVjNy0wYmNmLTQyMDQtOWJlYS0yZTJjMzcwY2E2MzkiLCAic3ViIjoiZWMxYzEzYTYtMWQ0MC00N2VmLWIyZmYtZTEzNTVjNTc1MGQwIiwgInRhcmdldF91cmwiOiJodHRwczovLzIxOWMtMjgwNC0xNGMtNDgzLTk4M2YtMjJjNi1mNjllLTZkMDYtZTNmZi5uZ3Jvay1mcmVlLmFwcC9zbGFzaGlkL3dlYmhvb2siLCAidHJpZ2dlcl9jb250ZW50Ijp7ImFuYWx5dGljc19tZXRhZGF0YSI6eyJhbmFseXRpY3NfY29ycmVsYXRpb25faWQiOiIwMDAwMDAwMC0wMDAwLTAwMDAtMDAwMC0wMDAwMDAwMDAwMDAiLCAiY2xpZW50X2lwX2FkZHJlc3MiOiIxODcuMTA2LjMzLjExNyJ9LCAiYnJvd3Nlcl9tZXRhZGF0YSI6eyJ1c2VyX2FnZW50IjoiTW96aWxsYS81LjAgKFgxMTsgVWJ1bnR1OyBMaW51eCB4ODZfNjQ7IHJ2OjEyMi4wKSBHZWNrby8yMDEwMDEwMSBGaXJlZm94LzEyMi4wIiwgIndpbmRvd19sb2NhdGlvbiI6Imh0dHA6Ly9sb2NhbGhvc3QvbG9naW4ifSwgImV2ZW50X21ldGFkYXRhIjp7ImV2ZW50X2lkIjoiZWMxYzEzYTYtMWQ0MC00N2VmLWIyZmYtZTEzNTVjNTc1MGQwIiwgImV2ZW50X25hbWUiOiJTbGFzaElEU0RLTG9hZGVkX3YxIiwgImV2ZW50X3R5cGUiOiJTbGFzaElEU0RLTG9hZGVkIiwgImV2ZW50X3ZlcnNpb24iOjEsICJvcmdhbml6YXRpb25faWQiOiI0MTJlZGI1Ny1hZTI2LWYyYWEtMDY5OC03NzAwMjFlZDUyZDEiLCAic291cmNlIjoyLCAidGltZXN0YW1wIjoiMjAyNC0wMy0wM1QwMjoxMjowMC4wNzQzNjY1NzJaIn19LCAidHJpZ2dlcl9uYW1lIjoiU2xhc2hJRFNES0xvYWRlZF92MSIsICJ0cmlnZ2VyX3R5cGUiOiJldmVudCIsICJ3ZWJob29rX2lkIjoiMDY1ZTNkYzUtYzViMi03ZTNmLWIxMDAtNjFmZGE4NzMyYjA3In0.YzOCFJfkniwCdagojfRUduiG-iGMrfx-Fq_F9X-XHuxAMqfcvY_O9B_mW1YIyJ5CAdcyMTWZVQLT_IMm8BVoyA';
+        $keys = '{"keys":[{"alg":"ES256", "crv":"P-256", "key_ops":["verify"], "kid":"nLkqWQ", "kty":"EC", "use":"sig", "x":"vnt1e8sfnhzj_DhV-F-nSMm0UknhiwBdfkFE-VaCuUY", "y":"8XPZ4mdsUkMMTqSVh2UoCtJ_E-IkpmbYtyqgmk-MjfI"}]}';
+
+        $historyContainer = [];
+        $webhook = $this->webhook($historyContainer, [
+            [200, $keys],
+        ]);
+
+        JWT::$timestamp = 1709433100;
+        $cache = new InMemoryCache(new ClockWaited());
+        $decoded = $webhook->decodeWebhookCall($jwt, $cache);
+
+        // Tests one arbitrary value.
+        $this->assertEquals('ec1c13a6-1d40-47ef-b2ff-e1355c5750d0', $decoded['trigger_content']['event_metadata']['event_id']);
+    }
+
+    /**
      * Instantiates a WebhookAbstraction.
      */
     protected function webhook(array &$historyContainer, array $mockCalls): WebhookAbstraction
     {
-        return new WebhookAbstraction($this->sdk($historyContainer, $mockCalls));
+        return $this->sdk($historyContainer, $mockCalls)->webhook();
     }
 }
