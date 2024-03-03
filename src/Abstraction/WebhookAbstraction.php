@@ -4,7 +4,6 @@ namespace SlashId\Php\Abstraction;
 
 use Firebase\JWT\CachedKeySet;
 use Firebase\JWT\JWT;
-use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\HttpFactory;
 use Psr\Cache\CacheItemPoolInterface;
 
@@ -209,15 +208,9 @@ class WebhookAbstraction extends AbstractionBase
 
     public function decodeWebhookCall(string $jwt, CacheItemPoolInterface $cache, $expiresAfter = 3600, $rateLimit = true)
     {
-        $httpClient = new Client([
-            'headers' => [
-                'SlashID-OrgID' => $this->sdk->getOrganizationId(),
-            ],
-        ]);
-
         $keySet = new CachedKeySet(
             $this->sdk->getApiUrl() . '/organizations/webhooks/verification-jwks',
-            $httpClient,
+            $this->client,
             new HttpFactory(),
             $cache,
             $expiresAfter,
