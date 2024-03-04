@@ -12,7 +12,7 @@ class WebhookAbstraction extends AbstractionBase
     /**
      * Finds all existing webhooks in the organization.
      *
-     * @return array<array<string|string[]>> A list of webhook definitions, each as an array, e.g.:
+     * @return array A list of webhook definitions, each as an array, e.g.:
      *
      *                 @code
      *                  [
@@ -41,9 +41,9 @@ class WebhookAbstraction extends AbstractionBase
     /**
      * Finds a webhook by ID.
      *
-     * @param string $id A webhook ID, e.g. "065de68b-cce0-7285-ab00-6f34a56b585d".
+     * @param string $id a webhook ID, e.g. "065de68b-cce0-7285-ab00-6f34a56b585d"
      *
-     * @return array<string|string[]> A webhook definition, e.g.:
+     * @return array A webhook definition, e.g.:
      *
      *                   @code
      *                      [
@@ -69,7 +69,7 @@ class WebhookAbstraction extends AbstractionBase
      *
      * @param string $url A webhook URL, e.g. as "https://example.com/slashid/webhook".
      *
-     * @return array<string|string[]> A webhook definition, e.g.:
+     * @return array A webhook definition, e.g.:
      *
      *                      @code
      *                      [
@@ -103,12 +103,12 @@ class WebhookAbstraction extends AbstractionBase
      * If a webhook with $url already exists, it will be updated (witha a PATCH request). If if doesn't exist, it will
      * be created with a POST request.
      *
-     * @param string                 $url      A webhook URL, e.g. as "https://example.com/slashid/webhook".
-     * @param string                 $name     A name for the webhook, e.g. "prod_webhook".
-     * @param string[]               $triggers A list of triggers, one of events listed on
-     *                                         https://developer.slashid.dev/docs/access/guides/webhooks
-     * @param array<string|string[]> $options  Optional fields in the Webhook. Please note that if the webhook already
-     *                                         exists, these fields will NOT be overridden unless specifically informed.
+     * @param string   $url      a webhook URL, e.g. as "https://example.com/slashid/webhook"
+     * @param string   $name     a name for the webhook, e.g. "prod_webhook"
+     * @param string[] $triggers a list of triggers, one of events listed on
+     *                           https://developer.slashid.dev/docs/access/guides/webhooks
+     * @param array    $options  Optional fields in the Webhook. Please note that if the webhook already exists, these
+     *                           fields will NOT be overridden unless specifically informed:
      *
      *                              @code
      *                              [
@@ -140,7 +140,7 @@ class WebhookAbstraction extends AbstractionBase
     /**
      * Delete a webhook given its ID.
      *
-     * @param string $id A webhook ID, e.g. "065de68b-cce0-7285-ab00-6f34a56b585d".
+     * @param string $id a webhook ID, e.g. "065de68b-cce0-7285-ab00-6f34a56b585d"
      */
     public function deleteById(string $id): void
     {
@@ -181,8 +181,8 @@ class WebhookAbstraction extends AbstractionBase
      *
      * Please note that existing triggers that are not in the $triggers list will be deleted from the webservice.
      *
-     * @param string   $id       A webhook ID, e.g. "065de68b-cce0-7285-ab00-6f34a56b585d".
-     * @param string[] $triggers A list of triggers, e.g. ['PersonCreated_v1', 'PersonDeleted_v1'].
+     * @param string   $id       a webhook ID, e.g. "065de68b-cce0-7285-ab00-6f34a56b585d"
+     * @param string[] $triggers a list of triggers, e.g. ['PersonCreated_v1', 'PersonDeleted_v1']
      */
     public function setWebhookTriggers(string $id, array $triggers): void
     {
@@ -202,7 +202,7 @@ class WebhookAbstraction extends AbstractionBase
     /**
      * Add a trigger to a webhook (without removing existing ones).
      *
-     * @param string $id      A webhook ID, e.g. "065de68b-cce0-7285-ab00-6f34a56b585d".
+     * @param string $id      a webhook ID, e.g. "065de68b-cce0-7285-ab00-6f34a56b585d"
      * @param string $trigger A trigger, e.g. "PersonCreated_v1".
      */
     public function addWebhookTrigger(string $id, string $trigger): void
@@ -216,7 +216,7 @@ class WebhookAbstraction extends AbstractionBase
     /**
      * Removes a trigger from a webhook.
      *
-     * @param string $id      A webhook ID, e.g. "065de68b-cce0-7285-ab00-6f34a56b585d".
+     * @param string $id      a webhook ID, e.g. "065de68b-cce0-7285-ab00-6f34a56b585d"
      * @param string $trigger A trigger, e.g. "PersonCreated_v1".
      */
     public function deleteWebhookTrigger(string $id, string $trigger): void
