@@ -6,6 +6,9 @@ use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
 use SlashId\Php\Abstraction\WebhookAbstraction;
 
+/**
+ * @phpstan-type WebserviceReturn array{result:mixed[]}
+ */
 class SlashIdSdk
 {
     public const ENVIRONMENT_PRODUCTION = 'production';
@@ -178,6 +181,7 @@ class SlashIdSdk
         }
 
         $response = $this->getClient()->request($method, $endpoint, $options);
+        /** @var WebserviceReturn|null */
         $parsedResponse = \json_decode((string) $response->getBody(), true);
 
         return $parsedResponse['result'] ?? null;

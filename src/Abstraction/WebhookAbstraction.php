@@ -38,7 +38,9 @@ class WebhookAbstraction extends AbstractionBase
      */
     public function findAll(): array
     {
-        return $this->sdk->get('/organizations/webhooks');
+        /** @var WebhookArray[] */
+        $response = $this->sdk->get('/organizations/webhooks');
+        return $response;
     }
 
     /**
@@ -137,6 +139,7 @@ class WebhookAbstraction extends AbstractionBase
         if ($webhook = $this->findByUrl($url)) {
             $this->sdk->patch('/organizations/webhooks/' . $webhook['id'], $payload);
         } else {
+            /** @var WebhookArray */
             $webhook = $this->sdk->post('/organizations/webhooks', $payload);
         }
 
@@ -176,9 +179,11 @@ class WebhookAbstraction extends AbstractionBase
      */
     public function getWebhookTriggers(string $id): array
     {
+        /** @var string[][] */
+        $response = $this->sdk->get('/organizations/webhooks/' . $id . '/triggers');
         return array_map(
             fn($trigger) => $trigger['trigger_name'],
-            $this->sdk->get('/organizations/webhooks/' . $id . '/triggers')
+            $response,
         );
     }
 
@@ -274,7 +279,9 @@ class WebhookAbstraction extends AbstractionBase
         $decoded = JWT::decode($jwt, $keySet);
 
         // Convert to array.
-        return \json_decode((string) \json_encode($decoded), true);
+        /** @var mixed[] */
+        $decodedAsArray = \json_decode((string) \json_encode($decoded), true);
+        return $decodedAsArray;
     }
 
     /**
