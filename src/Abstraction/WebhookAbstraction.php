@@ -40,6 +40,7 @@ class WebhookAbstraction extends AbstractionBase
     {
         /** @var WebhookArray[] */
         $response = $this->sdk->get('/organizations/webhooks');
+
         return $response;
     }
 
@@ -181,6 +182,7 @@ class WebhookAbstraction extends AbstractionBase
     {
         /** @var string[][] */
         $response = $this->sdk->get('/organizations/webhooks/' . $id . '/triggers');
+
         return array_map(
             fn($trigger) => $trigger['trigger_name'],
             $response,
@@ -281,6 +283,7 @@ class WebhookAbstraction extends AbstractionBase
         // Convert to array.
         /** @var mixed[] */
         $decodedAsArray = \json_decode((string) \json_encode($decoded), true);
+
         return $decodedAsArray;
     }
 
