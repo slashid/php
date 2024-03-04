@@ -67,7 +67,7 @@ class WebhookAbstraction extends AbstractionBase
      */
     public function findById(string $id): array
     {
-        /** @var WebhookArray */
+        /** @var array&WebhookArray */
         $response = $this->sdk->get('/organizations/webhooks/' . $id);
 
         return $response;
