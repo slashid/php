@@ -7,31 +7,34 @@ use Firebase\JWT\JWT;
 use GuzzleHttp\Psr7\HttpFactory;
 use Psr\Cache\CacheItemPoolInterface;
 
+/**
+ * @phpstan-type WebhookArray array{id: string, name: string, description: string, target_url: string, custom_headers: string[][], timeout: string}
+ */
 class WebhookAbstraction extends AbstractionBase
 {
     /**
      * Finds all existing webhooks in the organization.
      *
-     * @return array A list of webhook definitions, each as an array, e.g.:
+     * @return WebhookArray[] A list of webhook definitions, each as an array, e.g.:
      *
-     *                 @code
-     *                  [
-     *                      [
-     *                          'id' => '065de68b-cce0-7285-ab00-6f34a56b585d',
-     *                          'name' => 'prod_webhook',
-     *                          'description' => 'Some description...',
-     *                          'target_url' => 'https://example.com/slashid/webhook',
-     *                          'custom_headers' => [
-     *                              'X-Extra-Check' => ['Value for the header'],
-     *                          ],
-     *                          'timeout' => '30s',
-     *                      ],
-     *                      [
-     *                          'id' => ...
-     *                      ],
-     *                 ]
+     *                        @code
+     *                         [
+     *                             [
+     *                                 'id' => '065de68b-cce0-7285-ab00-6f34a56b585d',
+     *                                 'name' => 'prod_webhook',
+     *                                 'description' => 'Some description...',
+     *                                 'target_url' => 'https://example.com/slashid/webhook',
+     *                                 'custom_headers' => [
+     *                                     'X-Extra-Check' => ['Value for the header'],
+     *                                 ],
+     *                                 'timeout' => '30s',
+     *                             ],
+     *                             [
+     *                                 'id' => ...
+     *                             ],
+     *                        ]
      *
-     *                @endcode
+     *                        @endcode
      */
     public function findAll(): array
     {
@@ -43,25 +46,28 @@ class WebhookAbstraction extends AbstractionBase
      *
      * @param string $id a webhook ID, e.g. "065de68b-cce0-7285-ab00-6f34a56b585d"
      *
-     * @return array A webhook definition, e.g.:
+     * @return WebhookArray A webhook definition, e.g.:
      *
-     *                   @code
-     *                      [
-     *                          'id' => '065de68b-cce0-7285-ab00-6f34a56b585d',
-     *                          'name' => 'prod_webhook',
-     *                          'description' => 'Some description...',
-     *                          'target_url' => 'https://example.com/slashid/webhook',
-     *                          'custom_headers' => [
-     *                              'X-Extra-Check' => ['Value for the header'],
-     *                          ],
-     *                          timeout' => '30s',
-     *                      ]
+     *                      @code
+     *                         [
+     *                             'id' => '065de68b-cce0-7285-ab00-6f34a56b585d',
+     *                             'name' => 'prod_webhook',
+     *                             'description' => 'Some description...',
+     *                             'target_url' => 'https://example.com/slashid/webhook',
+     *                             'custom_headers' => [
+     *                                 'X-Extra-Check' => ['Value for the header'],
+     *                             ],
+     *                             timeout' => '30s',
+     *                         ]
      *
-     *                     @endcode
+     *                        @endcode
      */
     public function findById(string $id): array
     {
-        return $this->sdk->get('/organizations/webhooks/' . $id);
+        /** @var WebhookArray */
+        $response = $this->sdk->get('/organizations/webhooks/' . $id);
+
+        return $response;
     }
 
     /**
@@ -69,7 +75,7 @@ class WebhookAbstraction extends AbstractionBase
      *
      * @param string $url A webhook URL, e.g. as "https://example.com/slashid/webhook".
      *
-     * @return array A webhook definition, e.g.:
+     * @return WebhookArray A webhook definition, e.g.:
      *
      *                      @code
      *                      [
@@ -103,23 +109,23 @@ class WebhookAbstraction extends AbstractionBase
      * If a webhook with $url already exists, it will be updated (witha a PATCH request). If if doesn't exist, it will
      * be created with a POST request.
      *
-     * @param string   $url      a webhook URL, e.g. as "https://example.com/slashid/webhook"
-     * @param string   $name     a name for the webhook, e.g. "prod_webhook"
-     * @param string[] $triggers a list of triggers, one of events listed on
-     *                           https://developer.slashid.dev/docs/access/guides/webhooks
-     * @param array    $options  Optional fields in the Webhook. Please note that if the webhook already exists, these
-     *                           fields will NOT be overridden unless specifically informed:
+     * @param string                   $url      a webhook URL, e.g. as "https://example.com/slashid/webhook"
+     * @param string                   $name     a name for the webhook, e.g. "prod_webhook"
+     * @param string[]                 $triggers a list of triggers, one of events listed on
+     *                                           https://developer.slashid.dev/docs/access/guides/webhooks
+     * @param array<string|string[][]> $options  Optional fields in the Webhook. Please note that if the webhook already
+     *                                           exists, these fields will NOT be overridden unless specified:
      *
-     *                              @code
-     *                              [
-     *                                  'description' => 'Some description...',
-     *                                  'custom_headers' => [
-     *                                      'X-Extra-Check' => ['Value for the header'],
-     *                                  ],
-     *                                  'timeout' => '30s',
-     *                              ]
+     *                                           @code
+     *                                           [
+     *                                               'description' => 'Some description...',
+     *                                               'custom_headers' => [
+     *                                                   'X-Extra-Check' => ['Value for the header'],
+     *                                               ],
+     *                                               'timeout' => '30s',
+     *                                           ]
      *
-     *                              @endcode
+     *                                           @endcode
      */
     public function register(string $url, string $name, array $triggers, array $options = []): void
     {
@@ -268,7 +274,7 @@ class WebhookAbstraction extends AbstractionBase
         $decoded = JWT::decode($jwt, $keySet);
 
         // Convert to array.
-        return \json_decode(\json_encode($decoded), true);
+        return \json_decode((string) \json_encode($decoded), true);
     }
 
     /**
