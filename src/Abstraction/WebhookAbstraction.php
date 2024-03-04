@@ -243,7 +243,7 @@ class WebhookAbstraction extends AbstractionBase
      * @param bool                   $rateLimit    whether to enable rate limit of 10 request per seconds on lookup of
      *                                             invalid keys
      *
-     * @return mixed[] The decoded and validated JWT, as an array.
+     * @return mixed[] the decoded and validated JWT, as an array
      *
      * @see https://developer.slashid.dev/docs/access/guides/webhooks/introduction
      * @see https://developer.slashid.dev/docs/api/get-organizations-webhooks-verification-jwks
