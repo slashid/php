@@ -25,7 +25,8 @@
         "friendsofphp/php-cs-fixer": "^3.50",
         "phpunit/phpunit": "^10.5",
         "beste/in-memory-cache": "^1.1",
-        "crutch/clock-dev": "^1.0"
+        "crutch/clock-dev": "^1.0",
+        "phpstan/phpstan": "^1.10"
     },
     "scripts": {
         "test-cs": "vendor/bin/php-cs-fixer check --rules=@Symfony,@PER-CS2.0 .",
