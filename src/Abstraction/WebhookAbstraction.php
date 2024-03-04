@@ -7,61 +7,70 @@ use Firebase\JWT\JWT;
 use GuzzleHttp\Psr7\HttpFactory;
 use Psr\Cache\CacheItemPoolInterface;
 
+/**
+ * @phpstan-type WebhookArray array{id: string, name: string, description: string, target_url: string, custom_headers: string[][], timeout: string}
+ */
 class WebhookAbstraction extends AbstractionBase
 {
     /**
      * Finds all existing webhooks in the organization.
      *
-     * @return array[] A list of webhook definitions, each as an array, e.g.:
+     * @return WebhookArray[] A list of webhook definitions, each as an array, e.g.:
      *
-     *                 @code
-     *                  [
-     *                      [
-     *                          'id' => '065de68b-cce0-7285-ab00-6f34a56b585d',
-     *                          'name' => 'prod_webhook',
-     *                          'description' => 'Some description...',
-     *                          'target_url' => 'https://example.com/slashid/webhook',
-     *                          'custom_headers' => [
-     *                              'X-Extra-Check' => ['Value for the header'],
-     *                          ],
-     *                          'timeout' => '30s',
-     *                      ],
-     *                      [
-     *                          'id' => ...
-     *                      ],
-     *                 ]
+     *                        @code
+     *                         [
+     *                             [
+     *                                 'id' => '065de68b-cce0-7285-ab00-6f34a56b585d',
+     *                                 'name' => 'prod_webhook',
+     *                                 'description' => 'Some description...',
+     *                                 'target_url' => 'https://example.com/slashid/webhook',
+     *                                 'custom_headers' => [
+     *                                     'X-Extra-Check' => ['Value for the header'],
+     *                                 ],
+     *                                 'timeout' => '30s',
+     *                             ],
+     *                             [
+     *                                 'id' => ...
+     *                             ],
+     *                        ]
      *
-     *                @endcode
+     *                        @endcode
      */
     public function findAll(): array
     {
-        return $this->sdk->get('/organizations/webhooks');
+        /** @var WebhookArray[] */
+        $response = $this->sdk->get('/organizations/webhooks');
+
+        return $response;
     }
 
     /**
      * Finds a webhook by ID.
      *
-     * @param string $id A webhook ID, e.g. "065de68b-cce0-7285-ab00-6f34a56b585d".
+     * @param string $id a webhook ID, e.g. "065de68b-cce0-7285-ab00-6f34a56b585d"
      *
-     * @return array A webhook definition, e.g.:
+     * @return WebhookArray A webhook definition, e.g.:
      *
-     *                   @code
-     *                      [
-     *                          'id' => '065de68b-cce0-7285-ab00-6f34a56b585d',
-     *                          'name' => 'prod_webhook',
-     *                          'description' => 'Some description...',
-     *                          'target_url' => 'https://example.com/slashid/webhook',
-     *                          'custom_headers' => [
-     *                              'X-Extra-Check' => ['Value for the header'],
-     *                          ],
-     *                          timeout' => '30s',
-     *                      ]
+     *                      @code
+     *                         [
+     *                             'id' => '065de68b-cce0-7285-ab00-6f34a56b585d',
+     *                             'name' => 'prod_webhook',
+     *                             'description' => 'Some description...',
+     *                             'target_url' => 'https://example.com/slashid/webhook',
+     *                             'custom_headers' => [
+     *                                 'X-Extra-Check' => ['Value for the header'],
+     *                             ],
+     *                             timeout' => '30s',
+     *                         ]
      *
-     *                     @endcode
+     *                        @endcode
      */
     public function findById(string $id): array
     {
-        return $this->sdk->get('/organizations/webhooks/' . $id);
+        /** @var WebhookArray */
+        $response = $this->sdk->get('/organizations/webhooks/' . $id);
+
+        return $response;
     }
 
     /**
@@ -69,7 +78,7 @@ class WebhookAbstraction extends AbstractionBase
      *
      * @param string $url A webhook URL, e.g. as "https://example.com/slashid/webhook".
      *
-     * @return array A webhook definition, e.g.:
+     * @return WebhookArray A webhook definition, e.g.:
      *
      *                      @code
      *                      [
@@ -103,23 +112,23 @@ class WebhookAbstraction extends AbstractionBase
      * If a webhook with $url already exists, it will be updated (witha a PATCH request). If if doesn't exist, it will
      * be created with a POST request.
      *
-     * @param string   $url      A webhook URL, e.g. as "https://example.com/slashid/webhook".
-     * @param string   $name     A name for the webhook, e.g. "prod_webhook".
-     * @param string[] $triggers A list of triggers, one of events listed on
-     *                           https://developer.slashid.dev/docs/access/guides/webhooks
-     * @param array    $options  Optional fields in the Webhook. Please note that if the webhook already exists, these
-     *                           fields will NOT be overridden unless specifically informed.
+     * @param string                   $url      a webhook URL, e.g. as "https://example.com/slashid/webhook"
+     * @param string                   $name     a name for the webhook, e.g. "prod_webhook"
+     * @param string[]                 $triggers a list of triggers, one of events listed on
+     *                                           https://developer.slashid.dev/docs/access/guides/webhooks
+     * @param array<string|string[][]> $options  Optional fields in the Webhook. Please note that if the webhook already
+     *                                           exists, these fields will NOT be overridden unless specified:
      *
-     *                              @code
-     *                              [
-     *                                  'description' => 'Some description...',
-     *                                  'custom_headers' => [
-     *                                      'X-Extra-Check' => ['Value for the header'],
-     *                                  ],
-     *                                  'timeout' => '30s',
-     *                              ]
+     *                                           @code
+     *                                           [
+     *                                               'description' => 'Some description...',
+     *                                               'custom_headers' => [
+     *                                                   'X-Extra-Check' => ['Value for the header'],
+     *                                               ],
+     *                                               'timeout' => '30s',
+     *                                           ]
      *
-     *                              @endcode
+     *                                           @endcode
      */
     public function register(string $url, string $name, array $triggers, array $options = []): void
     {
@@ -131,6 +140,7 @@ class WebhookAbstraction extends AbstractionBase
         if ($webhook = $this->findByUrl($url)) {
             $this->sdk->patch('/organizations/webhooks/' . $webhook['id'], $payload);
         } else {
+            /** @var WebhookArray */
             $webhook = $this->sdk->post('/organizations/webhooks', $payload);
         }
 
@@ -140,7 +150,7 @@ class WebhookAbstraction extends AbstractionBase
     /**
      * Delete a webhook given its ID.
      *
-     * @param string $id A webhook ID, e.g. "065de68b-cce0-7285-ab00-6f34a56b585d".
+     * @param string $id a webhook ID, e.g. "065de68b-cce0-7285-ab00-6f34a56b585d"
      */
     public function deleteById(string $id): void
     {
@@ -158,7 +168,8 @@ class WebhookAbstraction extends AbstractionBase
             $this->deleteById($webhook['id']);
         } else {
             // @todo Create custom Exceptions.
-            throw new \Exception('There is no webhook in organization ' . $this->sdk->getOrganizationId() . ' for the URL "' . $url . '".');
+            $organizationId = $this->sdk->getOrganizationId();
+            throw new \Exception("There is no webhook in organization $organizationId for the URL \"$url\".");
         }
     }
 
@@ -169,12 +180,23 @@ class WebhookAbstraction extends AbstractionBase
      */
     public function getWebhookTriggers(string $id): array
     {
+        /** @var string[][] */
+        $response = $this->sdk->get('/organizations/webhooks/' . $id . '/triggers');
+
         return array_map(
             fn($trigger) => $trigger['trigger_name'],
-            $this->sdk->get('/organizations/webhooks/' . $id . '/triggers')
+            $response,
         );
     }
 
+    /**
+     * Overrides the triggers of a given webhook.
+     *
+     * Please note that existing triggers that are not in the $triggers list will be deleted from the webservice.
+     *
+     * @param string   $id       a webhook ID, e.g. "065de68b-cce0-7285-ab00-6f34a56b585d"
+     * @param string[] $triggers a list of triggers, e.g. ['PersonCreated_v1', 'PersonDeleted_v1']
+     */
     public function setWebhookTriggers(string $id, array $triggers): void
     {
         $existingTriggers = $this->getWebhookTriggers($id);
@@ -190,6 +212,12 @@ class WebhookAbstraction extends AbstractionBase
         }
     }
 
+    /**
+     * Add a trigger to a webhook (without removing existing ones).
+     *
+     * @param string $id      a webhook ID, e.g. "065de68b-cce0-7285-ab00-6f34a56b585d"
+     * @param string $trigger A trigger, e.g. "PersonCreated_v1".
+     */
     public function addWebhookTrigger(string $id, string $trigger): void
     {
         $this->sdk->post('/organizations/webhooks/' . $id . '/triggers', [
@@ -198,6 +226,12 @@ class WebhookAbstraction extends AbstractionBase
         ]);
     }
 
+    /**
+     * Removes a trigger from a webhook.
+     *
+     * @param string $id      a webhook ID, e.g. "065de68b-cce0-7285-ab00-6f34a56b585d"
+     * @param string $trigger A trigger, e.g. "PersonCreated_v1".
+     */
     public function deleteWebhookTrigger(string $id, string $trigger): void
     {
         $this->sdk->delete('/organizations/webhooks/' . $id . '/triggers', [
@@ -206,8 +240,35 @@ class WebhookAbstraction extends AbstractionBase
         ]);
     }
 
-    public function decodeWebhookCall(string $jwt, CacheItemPoolInterface $cache, $expiresAfter = 3600, $rateLimit = true)
-    {
+    /**
+     * Validates and decodes the JWT sent to a webhook listener.
+     *
+     * The JWT is checked using the JSON Web Signature with a public keyset provided by the
+     * /organizations/webhooks/verification-jwks API endpoint. The keys requested to the API are cached, so that we are
+     * not always making requests to the web service.
+     *
+     * To accomplish that, the library checking the JWT (firebase/php-jwt) requires a cache item pool compatible with
+     * PSR-6, please check how your framework's documentation to learn how to obtain it.
+     *
+     * @param string                 $jwt          a JWT sent from SlashID servers to a local webhook listener
+     * @param CacheItemPoolInterface $cache        a cache pool to cache the JWKS
+     * @param int                    $expiresAfter the number of seconds to keep the keys in the cache
+     * @param bool                   $rateLimit    whether to enable rate limit of 10 request per seconds on lookup of
+     *                                             invalid keys
+     *
+     * @return mixed[] the decoded and validated JWT, as an array
+     *
+     * @see https://developer.slashid.dev/docs/access/guides/webhooks/introduction
+     * @see https://developer.slashid.dev/docs/api/get-organizations-webhooks-verification-jwks
+     * @see https://en.wikipedia.org/wiki/JSON_Web_Signature
+     * @see https://github.com/firebase/php-jwt?tab=readme-ov-file#using-cached-key-sets
+     */
+    public function decodeWebhookCall(
+        string $jwt,
+        CacheItemPoolInterface $cache,
+        int $expiresAfter = 3600,
+        bool $rateLimit = true
+    ): array {
         $keySet = new CachedKeySet(
             $this->sdk->getApiUrl() . '/organizations/webhooks/verification-jwks',
             $this->client,
@@ -220,9 +281,15 @@ class WebhookAbstraction extends AbstractionBase
         $decoded = JWT::decode($jwt, $keySet);
 
         // Convert to array.
-        return \json_decode(\json_encode($decoded), true);
+        /** @var mixed[] */
+        $decodedAsArray = \json_decode((string) \json_encode($decoded), true);
+
+        return $decodedAsArray;
     }
 
+    /**
+     * Checks the type of the webhook trigger.
+     */
     protected function getWebhookTriggerType(string $trigger): string
     {
         return 'token_minted' === $trigger ? 'sync_hook' : 'event';
