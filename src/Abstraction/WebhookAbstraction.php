@@ -67,7 +67,7 @@ class WebhookAbstraction extends AbstractionBase
      */
     public function findById(string $id): array
     {
-        /** @var WebhookArray */
+        /** @var array&WebhookArray */
         $response = $this->sdk->get('/organizations/webhooks/' . $id);
 
         return $response;
@@ -129,8 +129,24 @@ class WebhookAbstraction extends AbstractionBase
      *                                           ]
      *
      *                                           @endcode
+     *
+     * @return WebhookArray A webhook definition, e.g.:
+     *
+     *                      @code
+     *                      [
+     *                          'id' => '065de68b-cce0-7285-ab00-6f34a56b585d',
+     *                          'name' => 'prod_webhook',
+     *                          'description' => 'Some description...',
+     *                          'target_url' => 'https://example.com/slashid/webhook',
+     *                          'custom_headers' => [
+     *                              'X-Extra-Check' => ['Value for the header'],
+     *                          ],
+     *                          'timeout' => '30s',
+     *                      ]
+     *
+     *                      @endcode
      */
-    public function register(string $url, string $name, array $triggers, array $options = []): void
+    public function register(string $url, string $name, array $triggers, array $options = []): array
     {
         $payload = [
             'target_url' => $url,
@@ -145,6 +161,8 @@ class WebhookAbstraction extends AbstractionBase
         }
 
         $this->setWebhookTriggers($webhook['id'], $triggers);
+
+        return $webhook;
     }
 
     /**
