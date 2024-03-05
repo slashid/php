@@ -161,6 +161,7 @@ class WebhookAbstraction extends AbstractionBase
         }
 
         $this->setWebhookTriggers($webhook['id'], $triggers);
+
         return $webhook;
     }
 
