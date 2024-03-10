@@ -189,8 +189,7 @@ class SlashIdSdk
 
         try {
             $response = $this->getClient()->request($method, $endpoint, $options);
-        }
-        catch (ClientException $clientException) {
+        } catch (ClientException $clientException) {
             throw $this->convertClientException($clientException);
         }
         /** @var WebserviceReturn|null */
@@ -209,7 +208,7 @@ class SlashIdSdk
         $parsedResponse = \json_decode((string) $response->getBody(), true);
 
         // 404 errors when then endpoint is invalid do NOT return a valid JSON.
-        $errorMessage = $parsedResponse ? ($parsedResponse['errors'][0]['message'] ?? NULL) : NULL;
+        $errorMessage = $parsedResponse ? ($parsedResponse['errors'][0]['message'] ?? null) : null;
 
         switch ($response->getStatusCode()) {
             case 400:
@@ -226,9 +225,8 @@ class SlashIdSdk
                 if ($errorMessage) {
                     return new IdNotFoundException($errorMessage, $clientException);
                 }
-                else {
-                    return new InvalidEndpointException('Could not find endpoint at ' . $request->getRequestTarget(), $clientException);
-                }
+
+                return new InvalidEndpointException('Could not find endpoint at ' . $request->getRequestTarget(), $clientException);
 
             case 409:
                 return new ConflictException($errorMessage, $clientException);

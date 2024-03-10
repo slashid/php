@@ -9,5 +9,4 @@ namespace SlashId\Php\Exception;
  * value. Try checking if the object already exists before creating a request or use a PUT when available. To see the
  * error message from the webservice, call ->getMessage().
  */
-class ConflictException extends ApiExceptionBase
-{}
+class ConflictException extends ApiExceptionBase {}

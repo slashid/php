@@ -7,7 +7,8 @@ use GuzzleHttp\Exception\BadResponseException;
 /**
  * Base class for exceptions thrown based on the API response.
  */
-class ApiExceptionBase extends BadResponseException {
+class ApiExceptionBase extends BadResponseException
+{
     public function __construct(
         ?string $message,
         BadResponseException $previous,

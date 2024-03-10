@@ -8,5 +8,4 @@ namespace SlashId\Php\Exception;
  * This will happen due to errors in the request, such as malformed ID or invalid data in the body of the request. To
  * see the error message from the webservice, call ->getMessage().
  */
-class BadRequestException extends ApiExceptionBase
-{}
+class BadRequestException extends ApiExceptionBase {}
