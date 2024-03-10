@@ -3,8 +3,15 @@
 namespace SlashId\Php;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\HandlerStack;
 use SlashId\Php\Abstraction\WebhookAbstraction;
+use SlashId\Php\Exception\AccessDeniedException;
+use SlashId\Php\Exception\BadRequestException;
+use SlashId\Php\Exception\ConflictException;
+use SlashId\Php\Exception\IdNotFoundException;
+use SlashId\Php\Exception\InvalidEndpointException;
+use SlashId\Php\Exception\UnauthorizedException;
 
 /**
  * @phpstan-type WebserviceReturn array{result:mixed[]}
@@ -180,11 +187,55 @@ class SlashIdSdk
             $options['body'] = \json_encode($body);
         }
 
-        $response = $this->getClient()->request($method, $endpoint, $options);
+        try {
+            $response = $this->getClient()->request($method, $endpoint, $options);
+        }
+        catch (ClientException $clientException) {
+            throw $this->convertClientException($clientException);
+        }
         /** @var WebserviceReturn|null */
         $parsedResponse = \json_decode((string) $response->getBody(), true);
 
         return $parsedResponse['result'] ?? null;
+    }
+
+    /**
+     * Process 4xx errors, converting into custom exceptions.
+     */
+    protected function convertClientException(ClientException $clientException): ClientException
+    {
+        $request = $clientException->getRequest();
+        $response = $clientException->getResponse();
+        $parsedResponse = \json_decode((string) $response->getBody(), true);
+
+        // 404 errors when then endpoint is invalid do NOT return a valid JSON.
+        $errorMessage = $parsedResponse ? ($parsedResponse['errors'][0]['message'] ?? NULL) : NULL;
+
+        switch ($response->getStatusCode()) {
+            case 400:
+                return new BadRequestException($errorMessage, $clientException);
+
+            case 401:
+                return new UnauthorizedException('Unauthorized: Please check the API Key and the Organization ID.', $clientException);
+
+            case 403:
+                return new AccessDeniedException("Access has been denied: $errorMessage.", $clientException);
+
+            case 404:
+                // If there is a valid response, it means this is a valid endpoint.
+                if ($errorMessage) {
+                    return new IdNotFoundException($errorMessage, $clientException);
+                }
+                else {
+                    return new InvalidEndpointException('Could not find endpoint at ' . $request->getRequestTarget(), $clientException);
+                }
+
+            case 409:
+                return new ConflictException($errorMessage, $clientException);
+        }
+
+        // If we could not convert the exception, throw the original exception.
+        return $clientException;
     }
 
     /**
