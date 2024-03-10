@@ -2,8 +2,15 @@
 
 namespace SlashId\Test\Php;
 
+use GuzzleHttp\Exception\ClientException;
 use PHPUnit\Framework\TestCase;
 use SlashId\Php\Abstraction\WebhookAbstraction;
+use SlashId\Php\Exception\AccessDeniedException;
+use SlashId\Php\Exception\BadRequestException;
+use SlashId\Php\Exception\ConflictException;
+use SlashId\Php\Exception\IdNotFoundException;
+use SlashId\Php\Exception\InvalidEndpointException;
+use SlashId\Php\Exception\UnauthorizedException;
 use SlashId\Php\SlashIdSdk;
 use SlashId\Test\Php\TestHelper\SdkInstantiationTrait;
 
@@ -53,9 +60,9 @@ class SlashIdSdkTest extends TestCase
     }
 
     /**
-     * Data provider for testRequests().
+     * Data provider for testRequest().
      */
-    public static function dataProviderTestRequests(): array
+    public static function dataProviderTestRequest(): array
     {
         // Real data from the sandbox web service.
         $person = '{"result":{"active":true,"person_id":"0659dd31-7e38-7d1e-8704-e3b8b6966176","region":"us-iowa","roles":[]}}';
@@ -127,9 +134,9 @@ class SlashIdSdkTest extends TestCase
     /**
      * Tests get(), post(), patch(), put(), delete().
      *
-     * @dataProvider dataProviderTestRequests
+     * @dataProvider dataProviderTestRequest
      */
-    public function testRequests(string $method, string $targetUrl, ?array $queryOrBody, int $responseHttpCode, string $responseBody, string $expectedRequestUrl, ?array $expectedResult): void
+    public function testRequest(string $method, string $targetUrl, ?array $queryOrBody, int $responseHttpCode, string $responseBody, string $expectedRequestUrl, ?array $expectedResult): void
     {
         $historyContainer = [];
         $sdk = $this->sdk($historyContainer, [[$responseHttpCode, $responseBody]]);
@@ -143,4 +150,81 @@ class SlashIdSdkTest extends TestCase
         $this->assertEquals($expectedRequestUrl, $request->getRequestTarget());
         $this->assertEquals($expectedResult, $result);
     }
+
+    /**
+     * Data provider for testRequestException().
+     */
+    public static function dataProviderTestRequestException(): array
+    {
+        return [
+            [
+                '/persons/aaa',
+                400,
+                '{"errors":[{"httpcode":400,"message":"invalid person_id"}]}',
+                BadRequestException::class,
+                'invalid person_id at GET /persons/aaa',
+            ],
+            [
+                '/persons/065e3eb6-ee23-7e63-a104-ea0c0824a1a4',
+                401,
+                '',
+                UnauthorizedException::class,
+                'Unauthorized, please check the API Key and the Organization ID at GET /persons/065e3eb6-ee23-7e63-a104-ea0c0824a1a4',
+            ],
+            [
+                '/persons/065e3eb6-ee23-7e63-a104-ea0c0824a1a4',
+                403,
+                '{"errors":[{"httpcode":403,"message":"access denied"}]}',
+                AccessDeniedException::class,
+                'Access has been denied: access denied at GET /persons/065e3eb6-ee23-7e63-a104-ea0c0824a1a4',
+            ],
+            [
+                '/persons/065e3eb6-ee23-7e63-a104-ea0c0824a1a4',
+                404,
+                '{"errors":[{"httpcode":404,"message":"could not find person 065e3eb6-ee23-7e63-a104-ea0c0824a1a4"}]}',
+                IdNotFoundException::class,
+                'could not find person 065e3eb6-ee23-7e63-a104-ea0c0824a1a4 at GET /persons/065e3eb6-ee23-7e63-a104-ea0c0824a1a4',
+            ],
+            [
+                '/invalid/endpoint',
+                404,
+                '404 page not found',
+                InvalidEndpointException::class,
+                'Could not find endpoint at GET /invalid/endpoint',
+            ],
+            // In real life, the 409 error will happen only in a POST.
+            [
+                '/persons/065e3eb6-ee23-7e63-a104-ea0c0824a1a4',
+                409,
+                '{"errors":[{"httpcode":409,"message":"person exists"}]}',
+                ConflictException::class,
+                'person exists at GET /persons/065e3eb6-ee23-7e63-a104-ea0c0824a1a4',
+            ],
+            // Tests an exception that does not actually exist.
+            [
+                '/unknown/exception',
+                402,
+                '',
+                ClientException::class,
+                'Client error: `GET https://api.slashid.com/unknown/exception` resulted in a `402 Payment Required` response',
+            ],
+        ];
+    }
+
+    /**
+     * Tests exceptions in request().
+     *
+     * @dataProvider dataProviderTestRequestException
+     */
+    public function testRequestException(string $targetUrl, int $responseHttpCode, string $responseBody, string $expectedException, string $expectedExceptionMessage): void
+    {
+        $this->expectException($expectedException);
+        $this->expectExceptionMessage($expectedExceptionMessage);
+
+        $historyContainer = [];
+        $sdk = $this->sdk($historyContainer, [[$responseHttpCode, $responseBody]]);
+
+        $sdk->get($targetUrl);
+    }
+
 }

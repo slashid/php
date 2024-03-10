@@ -219,7 +219,7 @@ class SlashIdSdk
                 return new UnauthorizedException('Unauthorized, please check the API Key and the Organization ID', $clientException);
 
             case 403:
-                return new AccessDeniedException("Access has been denied: $errorMessage.", $clientException);
+                return new AccessDeniedException("Access has been denied: $errorMessage", $clientException);
 
             case 404:
                 // If there is a valid response, it means this is a valid endpoint.
