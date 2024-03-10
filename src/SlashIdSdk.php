@@ -216,7 +216,7 @@ class SlashIdSdk
                 return new BadRequestException($errorMessage, $clientException);
 
             case 401:
-                return new UnauthorizedException('Unauthorized: Please check the API Key and the Organization ID.', $clientException);
+                return new UnauthorizedException('Unauthorized, please check the API Key and the Organization ID', $clientException);
 
             case 403:
                 return new AccessDeniedException("Access has been denied: $errorMessage.", $clientException);
@@ -227,7 +227,7 @@ class SlashIdSdk
                     return new IdNotFoundException($errorMessage, $clientException);
                 }
 
-                return new InvalidEndpointException('Could not find endpoint at ' . $request->getRequestTarget(), $clientException);
+                return new InvalidEndpointException('Could not find endpoint', $clientException);
 
             case 409:
                 return new ConflictException($errorMessage, $clientException);
