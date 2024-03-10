@@ -14,7 +14,7 @@ class ApiExceptionBase extends BadResponseException
         BadResponseException $previous,
     ) {
         parent::__construct(
-            $message,
+            $message ?? 'Error on ' . $previous->getRequest()->getRequestTarget(),
             $previous->getRequest(),
             $previous->getResponse(),
             $previous,

@@ -3,6 +3,7 @@
 namespace SlashId\Php;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\HandlerStack;
 use SlashId\Php\Abstraction\WebhookAbstraction;
@@ -201,14 +202,14 @@ class SlashIdSdk
     /**
      * Process 4xx errors, converting into custom exceptions.
      */
-    protected function convertClientException(ClientException $clientException): ClientException
+    protected function convertClientException(ClientException $clientException): BadResponseException
     {
         $request = $clientException->getRequest();
         $response = $clientException->getResponse();
         $parsedResponse = \json_decode((string) $response->getBody(), true);
 
         // 404 errors when then endpoint is invalid do NOT return a valid JSON.
-        $errorMessage = $parsedResponse ? ($parsedResponse['errors'][0]['message'] ?? null) : null;
+        $errorMessage = is_array($parsedResponse) ? ($parsedResponse['errors'][0]['message'] ?? null) : null;
 
         switch ($response->getStatusCode()) {
             case 400:
