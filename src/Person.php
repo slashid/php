@@ -43,7 +43,7 @@ class Person
     /**
      * The attributes of a user, indexed by bucket.
      *
-     * @var array<string, mixed[]>
+     * @var array<string, array<string, string|int|mixed[]|null>>
      */
     protected array $attributes = [];
 
@@ -59,7 +59,7 @@ class Person
      * @param  bool  $isActive  Whether the user is active. In an API response or a token it will look like: {"active": true}.
      * @param  string|null  $region  The Region. In an API response or a token it will look like: {"region": "us-iowa"}.
      */
-    public function __construct(
+    final public function __construct(
         public ?string $id = null,
         protected bool $isActive = true,
         protected ?string $region = null,
@@ -67,15 +67,15 @@ class Person
     }
 
     /**
-     * @param  array{active: bool, person_id: string, roles: string[], attributes: mixed[], region: string, handles: array{type: string, value: string}[], groups: string[]}  $values
+     * @param  array{active: bool, person_id: string, roles: string[], attributes: array<string, array<string, string|int|mixed[]|null>>, region: string, handles: array{type: string, value: string}[], groups: string[]}  $values
      */
     public static function fromValues(array $values): static
     {
-        $user = new self($values['person_id'], $values['active'], $values['region']);
+        $user = new static($values['person_id'], $values['active'], $values['region']);
 
         $user
             ->setGroups($values['groups'])
-            ->setAttributes($values['attributes']);
+            ->setAllAttributes($values['attributes']);
 
         foreach ($values['handles'] as $handle) {
             if (($handle['type'] === 'email_address')) {
@@ -228,7 +228,7 @@ class Person
     // ********************************
 
     /**
-     * @return array<string, array<string, mixed>> $attributes The user attributes, indexed by bucket.
+     * @return array<string, array<string, string|int|mixed[]|null>> $attributes The user attributes, indexed by bucket.
      */
     public function getAllAttributes(): array
     {
@@ -236,7 +236,7 @@ class Person
     }
 
     /**
-     * @param array<string, array<string, mixed>> $attributes  The user attributes, indexed by bucket.
+     * @param array<string, array<string, string|int|mixed[]|null>> $attributes  The user attributes, indexed by bucket.
      *
      * @return static The class itself.
      */
@@ -254,7 +254,7 @@ class Person
     /**
      * @param string $bucket The name of the bucket, one of self::BUCKET_*.
      *
-     * @return array<string, mixed>|null $attributes The user attributes in $bucket.
+     * @return array<string, string|int|mixed[]|null>|null $attributes The user attributes in $bucket.
      */
     public function getBucketAttributes(string $bucket): ?array
     {
@@ -265,7 +265,7 @@ class Person
 
     /**
      * @param string $bucket The name of the bucket, one of self::BUCKET_*.
-     * @param  array<string, mixed>  $attributes  The user attributes  in a given bucket.
+     * @param  array<string, string|int|mixed[]|null>  $attributes  The user attributes  in a given bucket.
      *
      * @return static The class itself.
      */
@@ -292,7 +292,7 @@ class Person
 
     /**
      * @param string $bucket The name of the bucket, one of self::BUCKET_*.
-     * @param  array<string, mixed> $attributes  The user attributes.
+     * @param string $attribute The attribute name.
      *
      * @return string|int|mixed[]|null The value of the attribute (or null if it doesn't exist).
      */
@@ -305,7 +305,7 @@ class Person
     /**
      * @param string $bucket The name of the bucket, one of self::BUCKET_*.
      * @param string $attribute The attribute name.
-     * @param string|int|mixed[] The value of the attribute.
+     * @param string|int|mixed[] $value The value of the attribute.
      *
      * @return static The class itself.
      */
@@ -385,10 +385,12 @@ class Person
     }
 
     /**
-     * @param mixed $bucket The bucket name to check.
+     * @param array-key $bucket The bucket name to check.
      */
     protected function assertBucketName(mixed $bucket): void
     {
-        if (!is_string($bucket) || !in_array($bucket, self::))
+        if (!is_string($bucket) || !in_array($bucket, self::BUCKET_NAMES)) {
+            throw new \InvalidArgumentException("The parameter \"$bucket\" is not a valid bucket name. Valid bucket names are: " . implode(', ', self::BUCKET_NAMES) . '.');
+        }
     }
 }
