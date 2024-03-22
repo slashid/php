@@ -2,12 +2,19 @@
 
 namespace SlashId\Php\Abstraction;
 
-use GuzzleHttp\Psr7\Response;
+use Psr\Http\Message\ResponseInterface;
 use SlashId\Php\PersonInterface;
 
 class MigrationAbstraction extends AbstractionBase
 {
-    public function migrateUsers(array $users): Response
+    /**
+     * Push persons to POST https://api.slashid.com/persons/bulk-import.
+     *
+     * @param \SlashId\Php\PersonInterface[] $users
+     *
+     * @see https://developer.slashid.dev/docs/api/post-persons-bulk-import
+     */
+    public function migrateUsers(array $users): ResponseInterface
     {
         // Write to CSV.
         $csvLines = array_merge(
