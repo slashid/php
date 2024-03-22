@@ -163,8 +163,9 @@ class Person implements PersonInterface
 
     public function setAllAttributes(array $attributes): static
     {
-        foreach (array_keys($attributes) as $bucket) {
+        foreach ($attributes as $bucket => $bucketAttributes) {
             $this->assertBucketName($bucket);
+            $this->assertAttributeNames($bucketAttributes);
         }
 
         $this->attributes = $attributes;
@@ -182,6 +183,7 @@ class Person implements PersonInterface
     public function setBucketAttributes(string $bucket, array $attributes): static
     {
         $this->assertBucketName($bucket);
+        $this->assertAttributeNames($attributes);
         $this->attributes[$bucket] = $attributes;
 
         return $this;
@@ -234,7 +236,7 @@ class Person implements PersonInterface
 
     public function hasAllGroups(array $groups): bool
     {
-        return ! count(array_diff($groups, $this->getGroups()));
+        return !count(array_diff($groups, $this->getGroups()));
     }
 
     // ************************
@@ -248,7 +250,7 @@ class Person implements PersonInterface
     protected function assertStringArray(string $parameterName, array $strings): void
     {
         foreach ($strings as $string) {
-            if (! is_string($string)) {
+            if (!is_string($string)) {
                 throw new \InvalidArgumentException("The $parameterName parameter must be a list of strings.");
             }
         }
@@ -261,6 +263,18 @@ class Person implements PersonInterface
     {
         if (!is_string($bucket) || !in_array($bucket, self::BUCKET_NAMES)) {
             throw new \InvalidArgumentException("The parameter \"$bucket\" is not a valid bucket name. Valid bucket names are: " . implode(', ', self::BUCKET_NAMES) . '.');
+        }
+    }
+
+    /**
+     * @param mixed[]
+     */
+    protected function assertAttributeNames(array $attributes): void
+    {
+        foreach (array_keys($attributes) as $attributeName) {
+            if (!is_string($attributeName)) {
+                throw new \InvalidArgumentException('The attributes array must be indexed by strings.');
+            }
         }
     }
 }
