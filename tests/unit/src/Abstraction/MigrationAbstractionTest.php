@@ -2,7 +2,8 @@
 
 namespace SlashId\Test\Php\Abstraction;
 
-use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
 use SlashId\Php\Abstraction\MigrationAbstraction;
 use SlashId\Php\PersonInterface;
@@ -15,7 +16,7 @@ class MigrationAbstractionTest extends TestCase
 {
     public function testMigrateUsers(): void
     {
-        $client = $this->createMock(ClientInterface::class);
+        $client = $this->createMock(Client::class);
         $sdk = $this->createConfiguredStub(SlashIdSdk::class, [
             'getClient' => $client,
         ]);
@@ -35,6 +36,12 @@ class MigrationAbstractionTest extends TestCase
 "test@example.com","+5511999888777","us-iowa","","Admin,Editor","{""end_user_no_access"":{""property"":""value""}}","$PP$AAAAA"
 ';
 
+        $result = [
+            'failed_csv' => 'CSV_CONTENTS',
+            'successful_imports' => 10,
+            'failed_imports' => 5,
+        ];
+
         $client
             ->expects($this->once())
             ->method('request')
@@ -50,8 +57,13 @@ class MigrationAbstractionTest extends TestCase
                         ],
                     ],
                 ]),
-            );
+            )
+            ->willReturn(new Response(body: json_encode([
+                'result' => $result,
+            ])));
 
-        $migration->migratePersons([$person]);
+        $response = $migration->migratePersons([$person]);
+
+        $this->assertEquals($result, $response);
     }
 }
