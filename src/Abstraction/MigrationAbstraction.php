@@ -19,7 +19,7 @@ class MigrationAbstraction extends AbstractionBase
                     'slashid:roles',
                     'slashid:groups',
                     'slashid:attributes',
-                    //'slashid:password',
+                    // 'slashid:password',
                 ],
             ],
             array_map(
@@ -30,21 +30,19 @@ class MigrationAbstraction extends AbstractionBase
                     '',
                     implode(',', $person->getGroups()),
                     json_encode($person->getAllAttributes()) ?: '',
-                    //$person->getLegacyPasswordToMigate() ?? '',
+                    // $person->getLegacyPasswordToMigate() ?? '',
                 ],
                 $users,
             ),
         );
 
-
-
         $csv = implode(
             "\n",
             array_map(
-                fn ($line) => '"'.implode('","', array_map(fn ($column) => str_replace('"', '""', $column), $line)).'"',
+                fn($line) => '"' . implode('","', array_map(fn($column) => str_replace('"', '""', $column), $line)) . '"',
                 $csvLines,
             ),
-        )."\n";
+        ) . "\n";
 
         return $this->sdk->getClient()->request('POST', '/persons/bulk-import', [
             'multipart' => [
