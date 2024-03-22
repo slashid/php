@@ -4,6 +4,7 @@ namespace SlashId\Test\Php;
 
 use GuzzleHttp\Exception\ClientException;
 use PHPUnit\Framework\TestCase;
+use SlashId\Php\Abstraction\MigrationAbstraction;
 use SlashId\Php\Abstraction\WebhookAbstraction;
 use SlashId\Php\Exception\AccessDeniedException;
 use SlashId\Php\Exception\BadRequestException;
@@ -43,6 +44,20 @@ class SlashIdSdkTest extends TestCase
     {
         $this->assertEquals('https://api.slashid.com', $this->sdk()->getApiUrl());
         $this->assertEquals('https://api.sandbox.slashid.com', $this->sdk(environment: SlashIdSdk::ENVIRONMENT_SANDBOX)->getApiUrl());
+    }
+
+    /**
+     * Tests migration().
+     */
+    public function testMigration(): void
+    {
+        $sdk = $this->sdk();
+        $migration = $sdk->migration();
+        $this->assertInstanceOf(MigrationAbstraction::class, $migration);
+
+        // Tests that the class is instantiated just once.
+        $resultOfSecondCall = $sdk->migration();
+        $this->assertEquals(spl_object_hash($migration), spl_object_hash($resultOfSecondCall));
     }
 
     /**
