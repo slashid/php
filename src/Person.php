@@ -162,7 +162,7 @@ class Person implements PersonInterface
         return $this->legacyPasswordToMigate ?? null;
     }
 
-    public function setLegacyPasswordToMigate(string $legacyPasswordToMigate): static
+    public function setLegacyPasswordToMigate(?string $legacyPasswordToMigate): static
     {
         $this->legacyPasswordToMigate = $legacyPasswordToMigate;
 
@@ -284,7 +284,7 @@ class Person implements PersonInterface
     }
 
     /**
-     * @param mixed[]
+     * @param mixed[] $attributes The list of attributes to check the keys.
      */
     protected function assertAttributeNames(array $attributes): void
     {

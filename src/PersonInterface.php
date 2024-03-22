@@ -117,9 +117,7 @@ interface PersonInterface
     /**
      * Method to be used only in User Migrations.
      *
-     * @param string|null a password hash to be sent to migration
-     *
-     * @return static the class itself
+     * @return string|null a password hash to be sent to migration
      */
     public function getLegacyPasswordToMigate(): ?string;
 
@@ -130,7 +128,7 @@ interface PersonInterface
      *
      * @return static the class itself
      */
-    public function setLegacyPasswordToMigate(string $legacyPasswordToMigate): static;
+    public function setLegacyPasswordToMigate(?string $legacyPasswordToMigate): static;
 
     // ********************************
     // ** Attribute-related methods. **
