@@ -2,24 +2,8 @@
 
 namespace SlashId\Php;
 
-class Person
+class Person implements PersonInterface
 {
-    public const BUCKET_ORGANIZATION_END_USER_NO_ACCESS = 'end_user_no_access';
-    public const BUCKET_ORGANIZATION_END_USER_READ_ONLY = 'end_user_read_only';
-    public const BUCKET_ORGANIZATION_END_USER_READ_WRITE = 'end_user_read_write';
-    public const BUCKET_PERSON_POOL_END_USER_NO_ACCESS = 'person_pool-end_user_no_access';
-    public const BUCKET_PERSON_POOL_END_USER_READ_ONLY = 'person_pool-end_user_read_only';
-    public const BUCKET_PERSON_POOL_END_USER_READ_WRITE = 'person_pool-end_user_read_write';
-
-    public const BUCKET_NAMES = [
-        self::BUCKET_ORGANIZATION_END_USER_NO_ACCESS,
-        self::BUCKET_ORGANIZATION_END_USER_READ_ONLY,
-        self::BUCKET_ORGANIZATION_END_USER_READ_WRITE,
-        self::BUCKET_PERSON_POOL_END_USER_NO_ACCESS,
-        self::BUCKET_PERSON_POOL_END_USER_READ_ONLY,
-        self::BUCKET_PERSON_POOL_END_USER_READ_WRITE,
-    ];
-
     /**
      * The email address, if it exists.
      *
@@ -54,20 +38,12 @@ class Person
      */
     protected array $groups = [];
 
-    /**
-     * @param string|null $id       The Person ID. In an API response or a token it will look like: {"person_id": "af5fbd30-7ce7-4548-8b30-4cd59cb2aba1"}.
-     * @param bool        $isActive Whether the user is active. In an API response or a token it will look like: {"active": true}.
-     * @param string|null $region   The Region. In an API response or a token it will look like: {"region": "us-iowa"}.
-     */
-    final public function __construct(
-        public ?string $id = null,
+    public function __construct(
+        protected ?string $personId = null,
         protected bool $isActive = true,
         protected ?string $region = null,
     ) {}
 
-    /**
-     * @param array{active: bool, person_id: string, roles: string[], attributes: array<string, array<string, string|int|mixed[]|null>>, region: string, handles: array{type: string, value: string}[], groups: string[]} $values
-     */
     public static function fromValues(array $values): static
     {
         $user = new static($values['person_id'], $values['active'], $values['region']);
@@ -92,19 +68,16 @@ class Person
     // ** Get/Set methods. **
     // **********************
 
-    /**
-     * @return bool whether the user is to be active
-     */
+    public function getPersonId(): ?string
+    {
+        return $this->personId;
+    }
+
     public function isActive(): bool
     {
         return $this->isActive;
     }
 
-    /**
-     * @param bool $isActive whether the user is to be active
-     *
-     * @return static the class itself
-     */
     public function setActive(bool $isActive): static
     {
         $this->isActive = $isActive;
@@ -112,18 +85,11 @@ class Person
         return $this;
     }
 
-    /**
-     * @return string[] a list of email addresses associated to the account
-     */
     public function getEmailAddresses(): array
     {
         return $this->emailAddresses;
     }
 
-    /**
-     * @return string $emailAddress an email addresses to add to the  list of emails associated to the account
-     * @return static the class itself
-     */
     public function addEmailAddress(string $emailAddress): static
     {
         $this->emailAddresses[] = $emailAddress;
@@ -132,11 +98,6 @@ class Person
         return $this;
     }
 
-    /**
-     * @param string[] $emailAddresses a list of email addresses associated to the account
-     *
-     * @return static the class itself
-     */
     public function setEmailAddresses(array $emailAddresses): static
     {
         $this->assertStringArray('$emailAddresses', $emailAddresses);
@@ -145,19 +106,11 @@ class Person
         return $this;
     }
 
-    /**
-     * @return string[] a list of phone numbers associated to the account
-     */
     public function getPhoneNumbers(): array
     {
         return $this->phoneNumbers;
     }
 
-    /**
-     * @param string $phoneNumber a phone number to add to the list of numbers associated to the account
-     *
-     * @return static the class itself
-     */
     public function addPhoneNumber(string $phoneNumber): static
     {
         $this->phoneNumbers[] = $phoneNumber;
@@ -166,11 +119,6 @@ class Person
         return $this;
     }
 
-    /**
-     * @param string[] $phoneNumbers a list of phone numbers associated to the account
-     *
-     * @return static the class itself
-     */
     public function setPhoneNumbers(array $phoneNumbers): static
     {
         $this->assertStringArray('$phoneNumbers', $phoneNumbers);
@@ -179,19 +127,11 @@ class Person
         return $this;
     }
 
-    /**
-     * @return string the region, one of us-iowa, europe-belgium, asia-japan, europe-england, australia-sydney
-     */
     public function getRegion(): ?string
     {
         return $this->region;
     }
 
-    /**
-     * @param string $region the region, one of us-iowa, europe-belgium, asia-japan, europe-england, australia-sydney
-     *
-     * @return static the class itself
-     */
     public function setRegion(string $region): static
     {
         $this->region = $region;
@@ -199,19 +139,11 @@ class Person
         return $this;
     }
 
-    /**
-     * @return string[] A list of groups, e.g. ['Editor', 'Admin'].
-     */
     public function getGroups(): array
     {
         return $this->groups;
     }
 
-    /**
-     * @param string[] $groups A list of groups, e.g. ['Editor', 'Admin'].
-     *
-     * @return static the class itself
-     */
     public function setGroups(array $groups): static
     {
         $this->assertStringArray('$groups', $groups);
@@ -224,19 +156,11 @@ class Person
     // ** Attribute-related methods. **
     // ********************************
 
-    /**
-     * @return array<string, array<string, string|int|mixed[]|null>> $attributes the user attributes, indexed by bucket
-     */
     public function getAllAttributes(): array
     {
         return $this->attributes;
     }
 
-    /**
-     * @param array<string, array<string, string|int|mixed[]|null>> $attributes the user attributes, indexed by bucket
-     *
-     * @return static the class itself
-     */
     public function setAllAttributes(array $attributes): static
     {
         foreach (array_keys($attributes) as $bucket) {
@@ -248,11 +172,6 @@ class Person
         return $this;
     }
 
-    /**
-     * @param string $bucket the name of the bucket, one of self::BUCKET_*
-     *
-     * @return array<string, string|int|mixed[]|null>|null $attributes the user attributes in $bucket
-     */
     public function getBucketAttributes(string $bucket): ?array
     {
         $this->assertBucketName($bucket);
@@ -260,12 +179,6 @@ class Person
         return $this->attributes[$bucket] ?? null;
     }
 
-    /**
-     * @param string                                 $bucket     the name of the bucket, one of self::BUCKET_*
-     * @param array<string, string|int|mixed[]|null> $attributes the user attributes  in a given bucket
-     *
-     * @return static the class itself
-     */
     public function setBucketAttributes(string $bucket, array $attributes): static
     {
         $this->assertBucketName($bucket);
@@ -274,11 +187,6 @@ class Person
         return $this;
     }
 
-    /**
-     * @param string $bucket the name of the bucket, one of self::BUCKET_*
-     *
-     * @return static the class itself
-     */
     public function deleteBucketAttributes(string $bucket): static
     {
         $this->assertBucketName($bucket);
@@ -287,12 +195,6 @@ class Person
         return $this;
     }
 
-    /**
-     * @param string $bucket    the name of the bucket, one of self::BUCKET_*
-     * @param string $attribute the attribute name
-     *
-     * @return string|int|mixed[]|null the value of the attribute (or null if it doesn't exist)
-     */
     public function getAttribute(string $bucket, string $attribute): string|int|array|null
     {
         $this->assertBucketName($bucket);
@@ -300,13 +202,6 @@ class Person
         return $this->attributes[$bucket][$attribute] ?? null;
     }
 
-    /**
-     * @param string             $bucket    the name of the bucket, one of self::BUCKET_*
-     * @param string             $attribute the attribute name
-     * @param string|int|mixed[] $value     the value of the attribute
-     *
-     * @return static the class itself
-     */
     public function setAttribute(string $bucket, string $attribute, string|int|array $value): static
     {
         $this->assertBucketName($bucket);
@@ -315,12 +210,6 @@ class Person
         return $this;
     }
 
-    /**
-     * @param string $bucket    the name of the bucket, one of self::BUCKET_*
-     * @param string $attribute the attribute name
-     *
-     * @return static the class itself
-     */
     public function deleteAttribute(string $bucket, string $attribute): static
     {
         $this->assertBucketName($bucket);
@@ -333,35 +222,16 @@ class Person
     // ** Group-checking methods. **
     // *****************************
 
-    /**
-     * Checks if the user is in a group.
-     *
-     * @return bool whether the user is in a group or not
-     */
     public function hasGroup(string $group): bool
     {
         return in_array($group, $this->getGroups());
     }
 
-    /**
-     * Checks if the user is in ANY of the groups listed.
-     *
-     * @param string[] $groups The list of groups to check, e.g. ['Editor', 'Admin'].
-     *
-     * @return bool whether the user is in ANY of the groups
-     */
     public function hasAnyGroup(array $groups): bool
     {
         return (bool) count(array_intersect($groups, $this->getGroups()));
     }
 
-    /**
-     * Checks if the user is in ALL of the groups listed.
-     *
-     * @param string[] $groups The list of groups to check, e.g. ['Editor', 'Admin'].
-     *
-     * @return bool whether the user is in ALL of the groups
-     */
     public function hasAllGroups(array $groups): bool
     {
         return ! count(array_diff($groups, $this->getGroups()));
