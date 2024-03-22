@@ -1,11 +1,12 @@
 <?php
 
-namespace SlashId\Php\Abstraction;
+namespace SlashId\Test\Php\Abstraction;
 
 use Beste\Cache\InMemoryCache;
 use Crutch\DevClock\ClockWaited;
 use Firebase\JWT\JWT;
 use PHPUnit\Framework\TestCase;
+use SlashId\Php\Abstraction\WebhookAbstraction;
 use SlashId\Test\Php\TestHelper\SdkInstantiationTrait;
 
 /**

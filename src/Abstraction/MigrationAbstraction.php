@@ -10,11 +10,11 @@ class MigrationAbstraction extends AbstractionBase
     /**
      * Push persons to POST https://api.slashid.com/persons/bulk-import.
      *
-     * @param \SlashId\Php\PersonInterface[] $users
+     * @param \SlashId\Php\PersonInterface[] $persons
      *
      * @see https://developer.slashid.dev/docs/api/post-persons-bulk-import
      */
-    public function migrateUsers(array $users): ResponseInterface
+    public function migratePersons(array $persons): ResponseInterface
     {
         // Write to CSV.
         $csvLines = array_merge(
@@ -26,7 +26,7 @@ class MigrationAbstraction extends AbstractionBase
                     'slashid:roles',
                     'slashid:groups',
                     'slashid:attributes',
-                    // 'slashid:password',
+                    'slashid:password',
                 ],
             ],
             array_map(
@@ -37,9 +37,9 @@ class MigrationAbstraction extends AbstractionBase
                     '',
                     implode(',', $person->getGroups()),
                     json_encode($person->getAllAttributes()) ?: '',
-                    // $person->getLegacyPasswordToMigate() ?? '',
+                    $person->getLegacyPasswordToMigate() ?? '',
                 ],
-                $users,
+                $persons,
             ),
         );
 

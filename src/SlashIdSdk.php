@@ -3,6 +3,7 @@
 namespace SlashId\Php;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\HandlerStack;
@@ -183,7 +184,7 @@ class SlashIdSdk
     /**
      * Gets the GuzzlePHP client, instantiating it if needed.
      */
-    public function getClient(): Client
+    public function getClient(): ClientInterface
     {
         if (!isset($this->client)) {
             $options = [
