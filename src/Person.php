@@ -284,7 +284,7 @@ class Person implements PersonInterface
     }
 
     /**
-     * @param mixed[] $attributes The list of attributes to check the keys.
+     * @param mixed[] $attributes the list of attributes to check the keys
      */
     protected function assertAttributeNames(array $attributes): void
     {
