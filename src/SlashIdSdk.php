@@ -82,7 +82,7 @@ class SlashIdSdk
     public function webhook(): WebhookAbstraction
     {
         if (!isset($this->webhook)) {
-            $this->webhook = new WebhookAbstraction($this, $this->getClient());
+            $this->webhook = new WebhookAbstraction($this);
         }
 
         return $this->webhook;
