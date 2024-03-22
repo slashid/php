@@ -226,5 +226,4 @@ class SlashIdSdkTest extends TestCase
 
         $sdk->get($targetUrl);
     }
-
 }
