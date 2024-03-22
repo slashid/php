@@ -12,9 +12,11 @@ class MigrationAbstraction extends AbstractionBase
      *
      * @param \SlashId\Php\PersonInterface[] $persons
      *
+     * @return array{failed_csv: ?string, successful_imports: int, failed_imports: int}
+     *
      * @see https://developer.slashid.dev/docs/api/post-persons-bulk-import
      */
-    public function migratePersons(array $persons): ResponseInterface
+    public function migratePersons(array $persons): array
     {
         // Write to CSV.
         $csvLines = array_merge(
@@ -51,7 +53,7 @@ class MigrationAbstraction extends AbstractionBase
             ),
         ) . "\n";
 
-        return $this->sdk->getClient()->request('POST', '/persons/bulk-import', [
+        $response = $this->sdk->getClient()->request('POST', '/persons/bulk-import', [
             'multipart' => [
                 [
                     'name' => 'persons',
@@ -60,5 +62,8 @@ class MigrationAbstraction extends AbstractionBase
                 ],
             ],
         ]);
+        /** @var array{result: array{failed_csv: ?string, successful_imports: int, failed_imports: int}} */
+        $decodedResponse = \json_decode((string) $response->getBody(), true);
+        return $decodedResponse['result'];
     }
 }
