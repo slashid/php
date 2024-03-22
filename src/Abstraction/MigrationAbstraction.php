@@ -2,7 +2,6 @@
 
 namespace SlashId\Php\Abstraction;
 
-use Psr\Http\Message\ResponseInterface;
 use SlashId\Php\PersonInterface;
 
 class MigrationAbstraction extends AbstractionBase
@@ -64,6 +63,7 @@ class MigrationAbstraction extends AbstractionBase
         ]);
         /** @var array{result: array{failed_csv: ?string, successful_imports: int, failed_imports: int}} */
         $decodedResponse = \json_decode((string) $response->getBody(), true);
+
         return $decodedResponse['result'];
     }
 }
