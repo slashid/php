@@ -289,7 +289,7 @@ class WebhookAbstraction extends AbstractionBase
     ): array {
         $keySet = new CachedKeySet(
             $this->sdk->getApiUrl() . '/organizations/webhooks/verification-jwks',
-            $this->client,
+            $this->sdk->getClient(),
             new HttpFactory(),
             $cache,
             $expiresAfter,

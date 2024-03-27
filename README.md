@@ -125,6 +125,55 @@ $sdk->delete('/organizations/webhooks/99999-99999-99999/triggers', [
 ]);
 ```
 
+#### `getClient()`
+
+The methods `$sdk->get()`, `$sdk->post()`, `$sdk->patch()`, `$sdk->put()` and `$sdk->delete()` expect sending and receiving JSON, but some endpoints have special requirements, e.g. `GET /persons/bulk-import` ([Fetch the import CSV template](https://developer.slashid.dev/docs/api/get-persons-bulk-import)) will return a CSV and requires a `Accept: text/csv` header.
+
+For those cases, you can use `$sdk->getClient()` to retrieve the underlying [GuzzlePHP](https://docs.guzzlephp.org) client with the proper credentials preset, for instance:
+
+```php
+$response = $sdk->getClient()->request('GET', '/persons/bulk-import', [
+    'headers' => [
+        'Accept' => 'text/csv',
+    ],
+]);
+
+$csvContents = (string) $response->getBody();
+```
+
+### Exceptions
+
+The following exceptions may be thrown in case of errors during the connection:
+
+* `\SlashId\Php\Exception\BadRequestException` when the API returns a **400** error, meaning that the data you've sent to the request is malformed or missing required information.
+* `\SlashId\Php\Exception\BadRequestException` when the API returns a **401** error, meaning that either the Organization ID, API key or environment are wrong. In this case, check your credentials.
+* `\SlashId\Php\Exception\AccessDeniedException` when the API returns a **403** error, meaning you are not allowed to perform an operation.
+* `\SlashId\Php\Exception\InvalidEndpointException` when the API returns a **404** error due to you requesting an endpoint that does not exist. In this case, check the [API reference](https://developer.slashid.dev/docs/api).
+* `\SlashId\Php\Exception\BadRequestException` when the API returns a **404** error on a valid endpoint, meaning the ID you've requested does not exist. This exception will happen on requests that include an ID in the URL, such as `/persons/1111-1111-1111`.
+* `\SlashId\Php\Exception\ConflictException` when the API returns a **409** error, usually meaning you are trying to create a duplicated entity (e.g. a person with an email already belonging to an existing person). In this case, check the [API reference](https://developer.slashid.dev/docs/api) to see if there is an idempotent version of the endpoint.
+* `\GuzzleHttp\Exception\ClientException` when the API returns any other **4xx** error.
+* `\GuzzleHttp\Exception\BadResponseException` when the API returns any **5xx** error.
+* Some implementation of `\GuzzleHttp\Exception\GuzzleException` if there is any other kind of error during the connection with the API server.
+
+All of `\SlashId\Php\Exception` exceptions are descendants of `\GuzzleHttp\Exception\BadResponseException`, which means that you can use the following methods to learn about the causes of the error:
+
+```php
+// Gets an informative message about the error.
+$exception->getMessage();
+
+// Gets the request object, with information about the endpoint and the data in the request.
+$request = $exception->getRequest();
+
+// Gets the response object, with HTTP response code and the response contents.
+$response = $exception->getResponse();
+
+// Gets the response as text.
+$responseText = (string) $exception->getResponse()->getBody();
+
+// Gets the response as a parsed array.
+$responseData = \json_decode((string) $exception->getResponse()->getBody(), true);
+```
+
 ### Webhook Abstraction
 
 The webhook abstraction is a class to help working with webhooks, for creating, listing and deleting them, and also adding and removing triggers.
