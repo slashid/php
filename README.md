@@ -174,6 +174,163 @@ $responseText = (string) $exception->getResponse()->getBody();
 $responseData = \json_decode((string) $exception->getResponse()->getBody(), true);
 ```
 
+### `\SlashId\Php\PersonInterface` / `\SlashId\Php\Person`
+
+The `Person` class is very useful for representing Person information coming from the `/persons/{id}` endpoint.
+
+You can instantiate a class with `Person::fromValues`, using the response from the endpoint.
+
+```php
+use SlashId\Php\Exception\IdNotFoundException;
+use SlashId\Php\Person;
+use SlashId\Php\PersonInterface;
+
+function getPerson($identifier): ?PersonInterface
+    try {
+        $response = $this->sdk->get('/persons/' . $identifier, [
+            'fields' => ['handles', 'groups', 'attributes'],
+        ]);
+
+        return Person::fromValues($response);
+    } catch (IdNotFoundException $exception) {
+        return null;
+    }
+}
+```
+
+With that, you have several functions to read the person data:
+
+```php
+// The ID, such as 9999-9999-9999. Can be null if the $person is created with `new Person()`.
+$person->getPersonId();
+
+// Whether the person active.
+$person->isActive();
+
+// The email addresses associated to the account, such as ['email@example.com', 'email2@example.com'].
+$person->getEmailAddresses();
+
+// The phone numbers associated to the account, such as ['+199999999', '+44999999999'].
+$person->getPhoneNumbers();
+
+// The region, one of "us-iowa", "europe-belgium", "asia-japan", "europe-england", "australia-sydney".
+$person->getRegion();
+
+// The groups of the person, e.g. ['Admin', 'Editor'].
+$person->getGroups();
+```
+
+We also have the respective setters:
+
+```php
+// Overrides whether the user is active.
+$person->setActive(false);
+
+// Adds one email address to the list.
+$person->addEmailAddress(string $emailAddress): static
+
+// Overrides the full list of email addresses.
+$person->setEmailAddresses(array $emailAddresses): static
+
+// Adds one phone number to the list.
+$person->addPhoneNumber(string $phoneNumber): static
+
+// Overrides the full list phone numbers.
+$person->setPhoneNumbers(array $phoneNumbers): static
+
+// Overrides the region.
+$person->setRegion(string $region): static
+
+// Overrides the list of groups.
+$person->setGroups(array $groups): static
+```
+
+:warning: Note that the methods in this class will *NOT* update the data in SlashID servers. To do that, you must do a request [`PATCH /persons/:person_id`](https://developer.slashid.dev/docs/api/patch-persons-person-id) or a request [`PUT /persons`](https://developer.slashid.dev/docs/api/put-persons).
+
+#### Attributes
+
+The person attributes in SlashID are [stored in buckets](https://developer.slashid.dev/docs/access/concepts/attribute_buckets). They are represented in this SDK by the following constants.
+
+| Constant                                                   | Bucket name                         | Scope        | End-user access |
+|------------------------------------------------------------|-------------------------------------|--------------|-----------------|
+| `PersonInterface::BUCKET_ORGANIZATION_END_USER_NO_ACCESS`  | `'end_user_no_access'`              | Organization | No access       |
+| `PersonInterface::BUCKET_ORGANIZATION_END_USER_READ_ONLY`  | `'end_user_read_only'`              | Organization | Read-only       |
+| `PersonInterface::BUCKET_ORGANIZATION_END_USER_READ_WRITE` | `'end_user_read_write'`             | Organization | Read-write      |
+| `PersonInterface::BUCKET_PERSON_POOL_END_USER_NO_ACCESS`   | `'person_pool-end_user_no_access'`  | Person-pool  | No access       |
+| `PersonInterface::BUCKET_PERSON_POOL_END_USER_READ_ONLY`   | `'person_pool-end_user_read_only'`  | Person-pool  | Read-only       |
+| `PersonInterface::BUCKET_PERSON_POOL_END_USER_READ_WRITE`  | `'person_pool-end_user_read_write'` | Person-pool  | Read-write      |
+
+:warning: Be careful not to expose "NO_ACCESS" attributes to the end-user.
+
+In the `Person`, the attributes are accessible with the following methods:
+
+```php
+// Lists all attributes, grouped by bucket name.
+$person->getBucketAttributes();
+
+// Response:
+[
+    PersonInterface::BUCKET_ORGANIZATION_END_USER_READ_WRITE => ['first_name' => 'John'],
+    PersonInterface::BUCKET_ORGANIZATION_END_USER_NO_ACCESS => ['secret_key' => 'aaa-aaa-aaa'],
+];
+
+// Gets attributes in a bucket.
+$person->getBucketAttributes(PersonInterface::BUCKET_ORGANIZATION_END_USER_READ_WRITE);
+
+// Response:
+['first_name' => 'John'];
+
+// Gets one specific attribute.
+$person->getAttribute(PersonInterface::BUCKET_ORGANIZATION_END_USER_READ_WRITE, 'first_name');
+
+// Response:
+'John';
+```
+
+The attributes can also be set:
+
+```php
+// Overrides ALL attributes.
+$person->setAllAttributes([
+    PersonInterface::BUCKET_ORGANIZATION_END_USER_READ_WRITE => ['first_name' => 'John'],
+    PersonInterface::BUCKET_ORGANIZATION_END_USER_NO_ACCESS => ['secret_key' => 'aaa-aaa-aaa'],
+]);
+
+// Overrides attributres in a bucket.
+$person->setBucketAttributes(PersonInterface::BUCKET_ORGANIZATION_END_USER_NO_ACCESS, ['secret_key' => 'aaa-aaa-aaa']);
+
+// Deletes the attributes in a bucket.
+$person->deleteBucketAttributes(PersonInterface::BUCKET_ORGANIZATION_END_USER_NO_ACCESS);
+
+// Overrides one attribute.
+$person->setAttribute(PersonInterface::BUCKET_ORGANIZATION_END_USER_READ_WRITE, 'last_name', 'Smith');
+
+// Deletes one attribute.
+$person->deleteAttribute(PersonInterface::BUCKET_ORGANIZATION_END_USER_READ_WRITE, 'first_name');
+```
+
+:warning: Note that the methods in this class will *NOT* update the data in SlashID servers. To do that, you must do a request [`PUT /persons/:person_id/attributes`](https://developer.slashid.dev/docs/api/put-persons-person-id-attributes) or [`/persons/:person_id/attributes/:bucket_name`](https://developer.slashid.dev/docs/api/put-persons-person-id-attributes-bucket-name).
+
+#### Groups
+
+The `Person` class also has three useful methods to test the person's groups:
+
+```php
+if ($person->hasGroup('Editor')) {
+    // Do things that only an "Editor" user can do.
+}
+
+if ($person->hasAnyGroup(['Admin', 'Editor', 'Reviewer'])) {
+    // Do things that someone in the group "Admin", OR in the group "Editor", OR
+    // in the group "Reviewer" can do.
+}
+
+if ($person->hasAllGroups(['Admin', 'Editor'])) {
+    // Do things that only someone that is in *both* "Admin" and "Editor" groups
+    // can do.
+}
+```
+
 ### Webhook Abstraction
 
 The webhook abstraction is a class to help working with webhooks, for creating, listing and deleting them, and also adding and removing triggers.
