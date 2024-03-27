@@ -331,9 +331,35 @@ if ($person->hasAllGroups(['Admin', 'Editor'])) {
 }
 ```
 
+### Migration Abstraction
+
+The migration abstraction is a class to [bulk importing users](https://developer.slashid.dev/docs/api/post-persons-bulk-import).
+
+To import users, you must first create an array of `\SlashId\Php\PersonInterface` and then call `$sdk->migration()->migratePersons($persons);`, for instance:
+
+```php
+$person = (new \SlashId\Php\Person())
+    ->setRegion('europe-england')
+    ->addEmailAddress('user@example.com')
+    ->addPhoneNumber('+33999999999')
+    ->setGroups(['Admin', 'Editor'])
+    // Define a password hash with one of the supported encryptions.
+    ->setLegacyPasswordToMigate('$2y$12$YKpfgBJpginFYyUfdAcAHumQKfJsEzJJz9d0oQgg0zoEsRSz6sXty');
+
+$persons = [$person];
+
+$response = $sdk->migration()->migratePersons($persons);
+```
+
+The `$response` will have the response of the endpoint [`POST /persons/bulk-import`](https://developer.slashid.dev/docs/api/post-persons-bulk-import), i.e., an array with three keys:
+
+* `successful_imports` - the number of persons that have successfully imported
+* `failed_imports` - the number of failures during the import
+* `failed_csv` - a CSV that reports the users that failed importing and the error reason for each line
+
 ### Webhook Abstraction
 
-The webhook abstraction is a class to help working with webhooks, for creating, listing and deleting them, and also adding and removing triggers.
+The webhook abstraction is a class to help working with [webhooks](https://developer.slashid.dev/docs/access/guides/webhooks/introduction), for creating, listing and deleting them, and also adding and removing triggers.
 
 You can access it with:
 
