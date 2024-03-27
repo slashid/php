@@ -267,7 +267,7 @@ class Person implements PersonInterface
     }
 
     /**
-     * @param mixed[]
+     * @param mixed[] $attributes
      */
     protected function assertAttributeNames(array $attributes): void
     {
