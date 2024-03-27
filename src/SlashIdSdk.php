@@ -6,6 +6,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\HandlerStack;
+use SlashId\Php\Abstraction\MigrationAbstraction;
 use SlashId\Php\Abstraction\WebhookAbstraction;
 use SlashId\Php\Exception\AccessDeniedException;
 use SlashId\Php\Exception\BadRequestException;
@@ -45,6 +46,7 @@ class SlashIdSdk
      * @see SlashIdSdk::getApiUrl()
      */
     protected string $apiUrl;
+    protected MigrationAbstraction $migration;
     protected WebhookAbstraction $webhook;
 
     public function __construct(
@@ -74,6 +76,18 @@ class SlashIdSdk
     public function getApiUrl(): string
     {
         return $this->apiUrl;
+    }
+
+    /**
+     * Instantiates a migration abstraction, to handle user migrations.
+     */
+    public function migration(): MigrationAbstraction
+    {
+        if (!isset($this->migration)) {
+            $this->migration = new MigrationAbstraction($this);
+        }
+
+        return $this->migration;
     }
 
     /**

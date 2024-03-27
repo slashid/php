@@ -114,6 +114,22 @@ interface PersonInterface
      */
     public function setGroups(array $groups): static;
 
+    /**
+     * Method to be used only in User Migrations.
+     *
+     * @return string|null a password hash to be sent to migration
+     */
+    public function getLegacyPasswordToMigate(): ?string;
+
+    /**
+     * Method to be used only in User Migrations.
+     *
+     * @param string|null $legacyPasswordToMigate a password hash to be sent to migration
+     *
+     * @return static the class itself
+     */
+    public function setLegacyPasswordToMigate(?string $legacyPasswordToMigate): static;
+
     // ********************************
     // ** Attribute-related methods. **
     // ********************************

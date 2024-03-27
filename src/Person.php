@@ -32,6 +32,11 @@ class Person implements PersonInterface
     protected array $attributes = [];
 
     /**
+     * Password hash used. The property is used for user migrations only.
+     */
+    protected ?string $legacyPasswordToMigate;
+
+    /**
      * The groups of the user.
      *
      * @var string[]
@@ -152,6 +157,18 @@ class Person implements PersonInterface
         return $this;
     }
 
+    public function getLegacyPasswordToMigate(): ?string
+    {
+        return $this->legacyPasswordToMigate ?? null;
+    }
+
+    public function setLegacyPasswordToMigate(?string $legacyPasswordToMigate): static
+    {
+        $this->legacyPasswordToMigate = $legacyPasswordToMigate;
+
+        return $this;
+    }
+
     // ********************************
     // ** Attribute-related methods. **
     // ********************************
@@ -267,7 +284,7 @@ class Person implements PersonInterface
     }
 
     /**
-     * @param mixed[] $attributes
+     * @param mixed[] $attributes the list of attributes to check the keys
      */
     protected function assertAttributeNames(array $attributes): void
     {
