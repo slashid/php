@@ -82,7 +82,7 @@ class SlashIdSdk
     public function webhook(): WebhookAbstraction
     {
         if (!isset($this->webhook)) {
-            $this->webhook = new WebhookAbstraction($this, $this->getClient());
+            $this->webhook = new WebhookAbstraction($this);
         }
 
         return $this->webhook;
@@ -167,6 +167,32 @@ class SlashIdSdk
     }
 
     /**
+     * Gets the GuzzlePHP client, instantiating it if needed.
+     */
+    public function getClient(): Client
+    {
+        if (!isset($this->client)) {
+            $options = [
+                'base_uri' => $this->apiUrl,
+                'headers' => [
+                    'Accept' => 'application/json',
+                    'Content-Type' => 'application/json',
+                    'SlashID-OrgID' => $this->organizationId,
+                    'SlashID-API-Key' => $this->apiKey,
+                ],
+            ];
+
+            if ($this->handlerStack) {
+                $options['handler'] = $this->handlerStack;
+            }
+
+            $this->client = new Client($options);
+        }
+
+        return $this->client;
+    }
+
+    /**
      * Performs a request.
      *
      * @param string       $method   either "GET", "POST", "PATCH", "PUT" or "DELETE"
@@ -235,31 +261,5 @@ class SlashIdSdk
 
         // If we could not convert the exception, throw the original exception.
         return $clientException;
-    }
-
-    /**
-     * Gets the GuzzlePHP client, instantiating it if needed.
-     */
-    protected function getClient(): Client
-    {
-        if (!isset($this->client)) {
-            $options = [
-                'base_uri' => $this->apiUrl,
-                'headers' => [
-                    'Accept' => 'application/json',
-                    'Content-Type' => 'application/json',
-                    'SlashID-OrgID' => $this->organizationId,
-                    'SlashID-API-Key' => $this->apiKey,
-                ],
-            ];
-
-            if ($this->handlerStack) {
-                $options['handler'] = $this->handlerStack;
-            }
-
-            $this->client = new Client($options);
-        }
-
-        return $this->client;
     }
 }

@@ -125,6 +125,22 @@ $sdk->delete('/organizations/webhooks/99999-99999-99999/triggers', [
 ]);
 ```
 
+#### `getClient()`
+
+The methods `$sdk->get()`, `$sdk->post()`, `$sdk->patch()`, `$sdk->put()` and `$sdk->delete()` expect sending and receiving JSON, but some endpoints have special requirements, e.g. `GET /persons/bulk-import` ([Fetch the import CSV template](https://developer.slashid.dev/docs/api/get-persons-bulk-import)) will return a CSV and requires a `Accept: text/csv` header.
+
+For those cases, you can use `$sdk->getClient()` to retrieve the underlying [GuzzlePHP](https://docs.guzzlephp.org) client with the proper credentials preset, for instance:
+
+```php
+$response = $sdk->getClient()->request('GET', '/persons/bulk-import', [
+    'headers' => [
+        'Accept' => 'text/csv',
+    ],
+]);
+
+$csvContents = (string) $response->getBody();
+```
+
 ### Exceptions
 
 The following exceptions may be thrown in case of errors during the connection:
