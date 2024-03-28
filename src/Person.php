@@ -34,7 +34,7 @@ class Person implements PersonInterface
     /**
      * Password hash used. The property is used for user migrations only.
      */
-    protected ?string $legacyPasswordToMigate;
+    protected ?string $LegacyPasswordToMigrate;
 
     /**
      * The groups of the user.
@@ -157,14 +157,14 @@ class Person implements PersonInterface
         return $this;
     }
 
-    public function getLegacyPasswordToMigate(): ?string
+    public function getLegacyPasswordToMigrate(): ?string
     {
-        return $this->legacyPasswordToMigate ?? null;
+        return $this->LegacyPasswordToMigrate ?? null;
     }
 
-    public function setLegacyPasswordToMigate(?string $legacyPasswordToMigate): static
+    public function setLegacyPasswordToMigrate(?string $LegacyPasswordToMigrate): static
     {
-        $this->legacyPasswordToMigate = $legacyPasswordToMigate;
+        $this->LegacyPasswordToMigrate = $LegacyPasswordToMigrate;
 
         return $this;
     }

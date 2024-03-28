@@ -29,7 +29,7 @@ class MigrationAbstractionTest extends TestCase
             'getAllAttributes' => [
                 PersonInterface::BUCKET_ORGANIZATION_END_USER_NO_ACCESS => ['property' => 'value'],
             ],
-            'getLegacyPasswordToMigate' => '$PP$AAAAA',
+            'getLegacyPasswordToMigrate' => '$PP$AAAAA',
         ]);
 
         $csv = '"slashid:emails","slashid:phone_numbers","slashid:region","slashid:roles","slashid:groups","slashid:attributes","slashid:password"

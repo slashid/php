@@ -344,7 +344,7 @@ $person = (new \SlashId\Php\Person())
     ->addPhoneNumber('+33999999999')
     ->setGroups(['Admin', 'Editor'])
     // Define a password hash with one of the supported encryptions.
-    ->setLegacyPasswordToMigate('$2y$12$YKpfgBJpginFYyUfdAcAHumQKfJsEzJJz9d0oQgg0zoEsRSz6sXty');
+    ->setLegacyPasswordToMigrate('$2y$12$YKpfgBJpginFYyUfdAcAHumQKfJsEzJJz9d0oQgg0zoEsRSz6sXty');
 
 $persons = [$person];
 

@@ -126,14 +126,14 @@ class PersonTest extends TestCase
     }
 
     /**
-     * Tests getLegacyPasswordToMigate()/setLegacyPasswordToMigate().
+     * Tests getLegacyPasswordToMigrate()/setLegacyPasswordToMigrate().
      */
-    public function testLegacyPasswordToMigate(): void
+    public function testLegacyPasswordToMigrate(): void
     {
         $person = new Person();
         $this->assertEmpty($person->getPhoneNumbers());
-        $person->setLegacyPasswordToMigate('$PP$AAAA');
-        $this->assertEquals('$PP$AAAA', $person->getLegacyPasswordToMigate());
+        $person->setLegacyPasswordToMigrate('$PP$AAAA');
+        $this->assertEquals('$PP$AAAA', $person->getLegacyPasswordToMigrate());
     }
 
     /**
