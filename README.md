@@ -146,10 +146,10 @@ $csvContents = (string) $response->getBody();
 The following exceptions may be thrown in case of errors during the connection:
 
 * `\SlashId\Php\Exception\BadRequestException` when the API returns a **400** error, meaning that the data you've sent to the request is malformed or missing required information.
-* `\SlashId\Php\Exception\BadRequestException` when the API returns a **401** error, meaning that either the Organization ID, API key or environment are wrong. In this case, check your credentials.
+* `\SlashId\Php\Exception\UnauthorizedException` when the API returns a **401** error, meaning that either the Organization ID, API key or environment are wrong. In this case, check your credentials.
 * `\SlashId\Php\Exception\AccessDeniedException` when the API returns a **403** error, meaning you are not allowed to perform an operation.
 * `\SlashId\Php\Exception\InvalidEndpointException` when the API returns a **404** error due to you requesting an endpoint that does not exist. In this case, check the [API reference](https://developer.slashid.dev/docs/api).
-* `\SlashId\Php\Exception\BadRequestException` when the API returns a **404** error on a valid endpoint, meaning the ID you've requested does not exist. This exception will happen on requests that include an ID in the URL, such as `/persons/1111-1111-1111`.
+* `\SlashId\Php\Exception\IdNotFoundException` when the API returns a **404** error on a valid endpoint, meaning the ID you've requested does not exist. This exception will happen on requests that include an ID in the URL, such as `/persons/1111-1111-1111`.
 * `\SlashId\Php\Exception\ConflictException` when the API returns a **409** error, usually meaning you are trying to create a duplicated entity (e.g. a person with an email already belonging to an existing person). In this case, check the [API reference](https://developer.slashid.dev/docs/api) to see if there is an idempotent version of the endpoint.
 * `\GuzzleHttp\Exception\ClientException` when the API returns any other **4xx** error.
 * `\GuzzleHttp\Exception\BadResponseException` when the API returns any **5xx** error.
@@ -266,7 +266,7 @@ In the `Person`, the attributes are accessible with the following methods:
 
 ```php
 // Lists all attributes, grouped by bucket name.
-$person->getBucketAttributes();
+$person->getAllAttributes();
 
 // Response:
 [
@@ -408,7 +408,7 @@ $webhook = $sdk->webhook()->findById('065de68b-cce0-7285-ab00-6f34a56b585d');
 The method `findByUrl($url)` fetches one single webhook when you have its URL.
 
 ```php
-$webhook = $sdk->webhook()->findById('https://example.com/slashid/webhook');
+$webhook = $sdk->webhook()->findByUrl('https://example.com/slashid/webhook');
 
 // $webhook:
 [
