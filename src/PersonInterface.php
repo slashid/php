@@ -119,16 +119,16 @@ interface PersonInterface
      *
      * @return string|null a password hash to be sent to migration
      */
-    public function getLegacyPasswordToMigate(): ?string;
+    public function getLegacyPasswordToMigrate(): ?string;
 
     /**
      * Method to be used only in User Migrations.
      *
-     * @param string|null $legacyPasswordToMigate a password hash to be sent to migration
+     * @param string|null $LegacyPasswordToMigrate a password hash to be sent to migration
      *
      * @return static the class itself
      */
-    public function setLegacyPasswordToMigate(?string $legacyPasswordToMigate): static;
+    public function setLegacyPasswordToMigrate(?string $LegacyPasswordToMigrate): static;
 
     // ********************************
     // ** Attribute-related methods. **

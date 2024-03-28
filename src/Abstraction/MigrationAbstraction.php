@@ -38,7 +38,7 @@ class MigrationAbstraction extends AbstractionBase
                     '',
                     implode(',', $person->getGroups()),
                     json_encode($person->getAllAttributes()) ?: '',
-                    $person->getLegacyPasswordToMigate() ?? '',
+                    $person->getLegacyPasswordToMigrate() ?? '',
                 ],
                 $persons,
             ),
