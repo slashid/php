@@ -2,7 +2,7 @@
 
 ## Installation
 
-Install the this library with composer:
+Install this library with composer:
 
 ```
 composer require slashid/slashid-php
@@ -15,8 +15,8 @@ composer require slashid/slashid-php
 First, create a SDK instance, informing the following:
 
 * `$environment`, either `sandbox` or `production`
-* `$organizationId`, your organization's ID. You'll find it your SlashID console (https://console.slashid.dev/ for production, https://console.sandbox.slashid.dev/ for sandbox), in the "Settings" tab, on the top of the page.
-* `$apiKey`, your organization's ID. You'll also find it your SlashID console, in the "Settings" tab, on the very bottom of the page.
+* `$organizationId`, your organization's ID. You'll find it in your SlashID console (https://console.slashid.dev/ for production, https://console.sandbox.slashid.dev/ for sandbox), in the "Settings" tab, on the top of the page.
+* `$apiKey`, your organization's ID. You'll also find it in your SlashID console, in the "Settings" tab, at the very bottom of the page.
 
 ```php
 use SlashId\Php\SlashIdSdk;
@@ -145,9 +145,9 @@ $csvContents = (string) $response->getBody();
 
 The following exceptions may be thrown in case of errors during the connection:
 
-* `\SlashId\Php\Exception\BadRequestException` when the API returns a **400** error, meaning that the data you've sent to the request is malformed or missing required information.
-* `\SlashId\Php\Exception\UnauthorizedException` when the API returns a **401** error, meaning that either the Organization ID, API key or environment are wrong. In this case, check your credentials.
-* `\SlashId\Php\Exception\AccessDeniedException` when the API returns a **403** error, meaning you are not allowed to perform an operation.
+* `\SlashId\Php\Exception\BadRequestException` when the API returns a **400** error, meaning that the data you've sent to the request is malformed or missing the required information.
+* `\SlashId\Php\Exception\UnauthorizedException` when the API returns a **401** error, meaning that either the Organization ID or API key is wrong. In this case, check your credentials.
+* `\SlashId\Php\Exception\AccessDeniedException` when the API returns a **403** error, meaning you are not allowed to access a resource.
 * `\SlashId\Php\Exception\InvalidEndpointException` when the API returns a **404** error due to you requesting an endpoint that does not exist. In this case, check the [API reference](https://developer.slashid.dev/docs/api).
 * `\SlashId\Php\Exception\IdNotFoundException` when the API returns a **404** error on a valid endpoint, meaning the ID you've requested does not exist. This exception will happen on requests that include an ID in the URL, such as `/persons/1111-1111-1111`.
 * `\SlashId\Php\Exception\ConflictException` when the API returns a **409** error, usually meaning you are trying to create a duplicated entity (e.g. a person with an email already belonging to an existing person). In this case, check the [API reference](https://developer.slashid.dev/docs/api) to see if there is an idempotent version of the endpoint.
@@ -198,19 +198,19 @@ function getPerson($identifier): ?PersonInterface
 }
 ```
 
-With that, you have several functions to read the person data:
+With that, you have several functions to read the person's data:
 
 ```php
-// The ID, such as 9999-9999-9999. Can be null if the $person is created with `new Person()`.
+// The ID, such as 9999-9999-9999. It can be null if the $person is created with `new Person()`.
 $person->getPersonId();
 
-// Whether the person active.
+// Whether the person is active.
 $person->isActive();
 
-// The email addresses associated to the account, such as ['email@example.com', 'email2@example.com'].
+// The email addresses associated with the account, such as ['email@example.com', 'email2@example.com'].
 $person->getEmailAddresses();
 
-// The phone numbers associated to the account, such as ['+199999999', '+44999999999'].
+// The phone numbers associated with the account, such as ['+199999999', '+44999999999'].
 $person->getPhoneNumbers();
 
 // The region, one of "us-iowa", "europe-belgium", "asia-japan", "europe-england", "australia-sydney".
@@ -235,7 +235,7 @@ $person->setEmailAddresses(array $emailAddresses): static
 // Adds one phone number to the list.
 $person->addPhoneNumber(string $phoneNumber): static
 
-// Overrides the full list phone numbers.
+// Overrides the full list of phone numbers.
 $person->setPhoneNumbers(array $phoneNumbers): static
 
 // Overrides the region.
@@ -245,7 +245,7 @@ $person->setRegion(string $region): static
 $person->setGroups(array $groups): static
 ```
 
-:warning: Note that the methods in this class will *NOT* update the data in SlashID servers. To do that, you must do a request [`PATCH /persons/:person_id`](https://developer.slashid.dev/docs/api/patch-persons-person-id) or a request [`PUT /persons`](https://developer.slashid.dev/docs/api/put-persons).
+:warning: Note that the methods in this class will *NOT* update the data in SlashID servers. To do that, you must make a request [`PATCH /persons/:person_id`](https://developer.slashid.dev/docs/api/patch-persons-person-id) or a request [`PUT /persons`](https://developer.slashid.dev/docs/api/put-persons).
 
 #### Attributes
 
@@ -296,7 +296,7 @@ $person->setAllAttributes([
     PersonInterface::BUCKET_ORGANIZATION_END_USER_NO_ACCESS => ['secret_key' => 'aaa-aaa-aaa'],
 ]);
 
-// Overrides attributres in a bucket.
+// Overrides attributes in a bucket.
 $person->setBucketAttributes(PersonInterface::BUCKET_ORGANIZATION_END_USER_NO_ACCESS, ['secret_key' => 'aaa-aaa-aaa']);
 
 // Deletes the attributes in a bucket.
@@ -355,11 +355,11 @@ The `$response` will have the response of the endpoint [`POST /persons/bulk-impo
 
 * `successful_imports` - the number of persons that have successfully imported
 * `failed_imports` - the number of failures during the import
-* `failed_csv` - a CSV that reports the users that failed importing and the error reason for each line
+* `failed_csv` - a CSV that reports the users that failed to import and the error reason for each line
 
 ### Webhook Abstraction
 
-The webhook abstraction is a class to help working with [webhooks](https://developer.slashid.dev/docs/access/guides/webhooks/introduction), for creating, listing and deleting them, and also adding and removing triggers.
+The webhook abstraction is a class to help work with [webhooks](https://developer.slashid.dev/docs/access/guides/webhooks/introduction), for creating, listing, and deleting them, and also adding and removing triggers.
 
 You can access it with:
 
@@ -425,7 +425,7 @@ $webhook = $sdk->webhook()->findByUrl('https://example.com/slashid/webhook');
 
 #### Creating webhooks and setting triggers
 
-The `register($url, $name, $triggers, $options)` method is idempotent, i.e., it will either create a webhook if it doesn't exist yet, or update it if there is already a webhook with that URL. After creating or updating the webhook, it will also register triggers for it. Thus, this method combines calls to `/organizations/webhooks` and `/organizations/webhooks/:webhook_id/triggers` endpoints.
+The `register($url, $name, $triggers, $options)` method is idempotent, i.e., it will either create a webhook if it doesn't exist yet or update it if there is already a webhook with that URL. After creating or updating the webhook, it will also register triggers for it. Thus, this method combines calls to `/organizations/webhooks` and `/organizations/webhooks/:webhook_id/triggers` endpoints.
 
 ```php
 $webhook = $sdk->webhook()->register('https://example.com/slashid/webhook', 'a_unique_name_for_the_webhook', [
@@ -531,7 +531,7 @@ You can also handle triggers directly.
 
 The method `setTriggers($id, $triggers)` will override existing triggers, deleting triggers that are not in the `$triggers` list and adding new ones that are not.
 
-The method `addWebhookTrigger($id, $trigger)` add one single trigger from a webhook.
+The method `addWebhookTrigger($id, $trigger)` adds one single trigger from a webhook.
 
 The method `deleteWebhookTrigger($id, $trigger)` removes one single trigger from a webhook.
 
