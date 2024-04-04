@@ -30,11 +30,28 @@ class SlashIdSdkTest extends TestCase
     }
 
     /**
+     * Tests getEnvironment().
+     */
+    public function testGetEnvironment(): void
+    {
+        $this->assertEquals(SlashIdSdk::ENVIRONMENT_PRODUCTION, $this->sdk()->getEnvironment());
+        $this->assertEquals(SlashIdSdk::ENVIRONMENT_SANDBOX, $this->sdk(environment: SlashIdSdk::ENVIRONMENT_SANDBOX)->getEnvironment());
+    }
+
+    /**
      * Tests getOrganizationId().
      */
     public function testGetOrganizationId(): void
     {
         $this->assertEquals('org_id', $this->sdk()->getOrganizationId());
+    }
+
+    /**
+     * Tests getApiKey().
+     */
+    public function testGetApiKey(): void
+    {
+        $this->assertEquals('api_key', $this->sdk()->getApiKey());
     }
 
     /**
