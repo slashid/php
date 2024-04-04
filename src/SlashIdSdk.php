@@ -63,11 +63,29 @@ class SlashIdSdk
     }
 
     /**
+     * Gets the environment.
+     *
+     * @return string the environment, SlashIdSdk::ENVIRONMENT_PRODUCTION or SlashIdSdk::ENVIRONMENT_SANDBOX
+     */
+    public function getEnvironment(): string
+    {
+        return $this->environment;
+    }
+
+    /**
      * Gets the organization ID, as informed to the constructor.
      */
     public function getOrganizationId(): string
     {
         return $this->organizationId;
+    }
+
+    /**
+     * Gets the API Key, as informed to the constructor.
+     */
+    public function getApiKey(): string
+    {
+        return $this->apiKey;
     }
 
     /**
