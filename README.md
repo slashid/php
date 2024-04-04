@@ -5,7 +5,7 @@
 Install this library with composer:
 
 ```
-composer require slashid/slashid-php
+composer require slashid/php
 ```
 
 ## Usage
