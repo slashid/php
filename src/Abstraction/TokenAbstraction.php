@@ -19,12 +19,13 @@ class TokenAbstraction extends AbstractionBase
 
         $tokenParts = explode('.', $token);
 
-        if (count($tokenParts) !== 3) {
+        if (3 !== count($tokenParts)) {
             throw new MalformedTokenException('The token is malformed.');
         }
 
         [, $userDataTokenPart] = $tokenParts;
         $userData = json_decode(base64_decode($userDataTokenPart), true);
+
         return $userData['sub'];
     }
 }
