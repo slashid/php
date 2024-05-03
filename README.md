@@ -357,6 +357,30 @@ The `$response` will have the response of the endpoint [`POST /persons/bulk-impo
 * `failed_imports` - the number of failures during the import
 * `failed_csv` - a CSV that reports the users that failed to import and the error reason for each line
 
+### Token Abstraction
+
+The token abstraction is a class to help validating and manipulating the token used for authentication.
+
+#### Validating token
+
+To validate an authentication token, use the method `validateToken`:
+
+```php
+if ($sdk->token()->validateToken($token)) {
+    // Token is valid.
+}
+```
+
+#### Getting the person ID from the token
+
+To get the Person ID (the "sub" in the token), use the method `getSubFromToken`:
+
+```php
+$personId = $sdk->token()->getSubFromToken($token);
+
+// $personId will be something such as "903c1ff9-f2cc-435c-b242-9d8a690fcf0a".
+```
+
 ### Webhook Abstraction
 
 The webhook abstraction is a class to help work with [webhooks](https://developer.slashid.dev/docs/access/guides/webhooks/introduction), for creating, listing, and deleting them, and also adding and removing triggers.
