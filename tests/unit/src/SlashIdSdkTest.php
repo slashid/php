@@ -5,6 +5,7 @@ namespace SlashId\Test\Php;
 use GuzzleHttp\Exception\ClientException;
 use PHPUnit\Framework\TestCase;
 use SlashId\Php\Abstraction\MigrationAbstraction;
+use SlashId\Php\Abstraction\TokenAbstraction;
 use SlashId\Php\Abstraction\WebhookAbstraction;
 use SlashId\Php\Exception\AccessDeniedException;
 use SlashId\Php\Exception\BadRequestException;
@@ -75,6 +76,20 @@ class SlashIdSdkTest extends TestCase
         // Tests that the class is instantiated just once.
         $resultOfSecondCall = $sdk->migration();
         $this->assertEquals(spl_object_hash($migration), spl_object_hash($resultOfSecondCall));
+    }
+
+    /**
+     * Tests token().
+     */
+    public function testToken(): void
+    {
+        $sdk = $this->sdk();
+        $token = $sdk->token();
+        $this->assertInstanceOf(TokenAbstraction::class, $token);
+
+        // Tests that the class is instantiated just once.
+        $resultOfSecondCall = $sdk->token();
+        $this->assertEquals(spl_object_hash($token), spl_object_hash($resultOfSecondCall));
     }
 
     /**
