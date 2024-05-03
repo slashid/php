@@ -8,7 +8,10 @@ class TokenAbstraction extends AbstractionBase
 {
     public function validateToken(string $token): bool
     {
-        return $this->sdk->post('/token/validate', ['token' => $token])['valid'] ?? false;
+        /** @var bool[] */
+        $response = $this->sdk->post('/token/validate', ['token' => $token]);
+
+        return $response['valid'] ?? false;
     }
 
     public function getSubFromToken(string $token): string
@@ -24,6 +27,7 @@ class TokenAbstraction extends AbstractionBase
         }
 
         [, $userDataTokenPart] = $tokenParts;
+        /** @var string[] */
         $userData = json_decode(base64_decode($userDataTokenPart), true);
 
         return $userData['sub'];
