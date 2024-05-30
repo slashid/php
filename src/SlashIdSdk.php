@@ -7,6 +7,7 @@ use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\HandlerStack;
 use SlashId\Php\Abstraction\MigrationAbstraction;
+use SlashId\Php\Abstraction\TokenAbstraction;
 use SlashId\Php\Abstraction\WebhookAbstraction;
 use SlashId\Php\Exception\AccessDeniedException;
 use SlashId\Php\Exception\BadRequestException;
@@ -47,6 +48,7 @@ class SlashIdSdk
      */
     protected string $apiUrl;
     protected MigrationAbstraction $migration;
+    protected TokenAbstraction $token;
     protected WebhookAbstraction $webhook;
 
     public function __construct(
@@ -106,6 +108,18 @@ class SlashIdSdk
         }
 
         return $this->migration;
+    }
+
+    /**
+     * Instantiates a token abstraction, to handle authentication tokens.
+     */
+    public function token(): TokenAbstraction
+    {
+        if (!isset($this->token)) {
+            $this->token = new TokenAbstraction($this);
+        }
+
+        return $this->token;
     }
 
     /**
